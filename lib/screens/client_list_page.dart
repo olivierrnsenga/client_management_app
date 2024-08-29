@@ -126,42 +126,44 @@ class _ClientListPageState extends State<ClientListPage> {
           } else if (state is ClientLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is ClientLoaded) {
-            return SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                columns: const [
-                  DataColumn(label: Text('First Name')),
-                  DataColumn(label: Text('Last Name')),
-                  DataColumn(label: Text('Email')),
-                  DataColumn(label: Text('Phone')),
-                  DataColumn(label: Text('City')),
-                  DataColumn(label: Text('Actions')),
-                ],
-                rows: state.clients.map((client) {
-                  return DataRow(
-                    cells: [
-                      DataCell(Text(client.firstName)),
-                      DataCell(Text(client.lastName)),
-                      DataCell(Text(client.email)),
-                      DataCell(Text(client.phone)),
-                      DataCell(Text(client.city)),
-                      DataCell(
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () => _updateClient(client),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete),
-                              onPressed: () => _deleteClient(client),
-                            ),
-                          ],
+            return Center(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  columns: const [
+                    DataColumn(label: Text('First Name')),
+                    DataColumn(label: Text('Last Name')),
+                    DataColumn(label: Text('Email')),
+                    DataColumn(label: Text('Phone')),
+                    DataColumn(label: Text('City')),
+                    DataColumn(label: Text('Actions')),
+                  ],
+                  rows: state.clients.map((client) {
+                    return DataRow(
+                      cells: [
+                        DataCell(Text(client.firstName)),
+                        DataCell(Text(client.lastName)),
+                        DataCell(Text(client.email)),
+                        DataCell(Text(client.phone)),
+                        DataCell(Text(client.city)),
+                        DataCell(
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () => _updateClient(client),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () => _deleteClient(client),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  );
-                }).toList(),
+                      ],
+                    );
+                  }).toList(),
+                ),
               ),
             );
           } else if (state is ClientError) {

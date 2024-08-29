@@ -73,6 +73,22 @@ class _EditClientPageState extends State<EditClientPage> {
     }
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        _dateOfBirthController.text =
+            "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -141,9 +157,16 @@ class _EditClientPageState extends State<EditClientPage> {
               ),
               TextFormField(
                 controller: _dateOfBirthController,
-                decoration: const InputDecoration(labelText: 'Date of Birth'),
+                decoration: InputDecoration(
+                  labelText: 'Date of Birth',
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.calendar_today),
+                    onPressed: () => _selectDate(context),
+                  ),
+                ),
+                readOnly: true,
                 validator: (value) => value?.isEmpty ?? true
-                    ? 'Please enter date of birth'
+                    ? 'Please select date of birth'
                     : null,
               ),
             ],
