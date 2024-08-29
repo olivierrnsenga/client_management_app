@@ -42,13 +42,6 @@ class _ClientListPageState extends State<ClientListPage> {
           } else if (state is ClientLoaded) {
             return Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    'Total Clients: ${state.totalCount}',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                ),
                 Expanded(
                   child: ListView.builder(
                     itemCount: state.clients.length,
@@ -66,6 +59,7 @@ class _ClientListPageState extends State<ClientListPage> {
                   child: PaginationControls(
                     currentPage: state.currentPage,
                     totalPages: state.totalPages,
+                    totalCount: state.totalCount,
                     onPageChanged: (page) {
                       _clientBloc
                           .add(FetchClients(pageNumber: page, pageSize: 10));
