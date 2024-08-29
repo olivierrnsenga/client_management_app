@@ -43,15 +43,35 @@ class _ClientListPageState extends State<ClientListPage> {
             return Column(
               children: [
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: state.clients.length,
-                    itemBuilder: (context, index) {
-                      final client = state.clients[index];
-                      return ListTile(
-                        title: Text('${client.firstName} ${client.lastName}'),
-                        subtitle: Text(client.email),
-                      );
-                    },
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      columns: const [
+                        DataColumn(label: Text('First Name')),
+                        DataColumn(label: Text('Last Name')),
+                        DataColumn(label: Text('Email')),
+                        DataColumn(label: Text('Phone')),
+                        DataColumn(label: Text('Address')),
+                        DataColumn(label: Text('City')),
+                        DataColumn(label: Text('State')),
+                        DataColumn(label: Text('Date of Birth')),
+                      ],
+                      rows: state.clients.map((client) {
+                        return DataRow(
+                          cells: [
+                            DataCell(Text(client.firstName)),
+                            DataCell(Text(client.lastName)),
+                            DataCell(Text(client.email)),
+                            DataCell(Text(client.phone)),
+                            DataCell(Text(
+                                '${client.address}, ${client.city}, ${client.state}, ${client.zipCode}')),
+                            DataCell(Text(client.city)),
+                            DataCell(Text(client.state)),
+                            DataCell(Text(client.dateOfBirth)),
+                          ],
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ),
                 Padding(
