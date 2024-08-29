@@ -65,10 +65,12 @@ class ClientRepository {
 
   Future<ClientResponse> searchClients(
       String searchTerm, int pageNumber, int pageSize) async {
-    final response = await http.get(
-      Uri.parse(
-          '$baseUrl/Clients/search?searchTerm=$searchTerm&pageNumber=$pageNumber&pageSize=$pageSize'),
+    final uri = Uri.parse(
+      '$baseUrl/Clients/search?searchTerm=$searchTerm&pageNumber=$pageNumber&pageSize=$pageSize',
     );
+
+    final response = await http.get(uri);
+
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       final paginationHeader = response.headers['x-pagination'] ?? '{}';

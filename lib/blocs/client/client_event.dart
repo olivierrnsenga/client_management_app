@@ -14,3 +14,17 @@ class FetchClients extends ClientEvent {
   @override
   List<Object> get props => [pageNumber, pageSize];
 }
+
+class SearchClients extends ClientEvent {
+  final String searchTerm;
+  final int pageNumber;
+  final int pageSize;
+
+  SearchClients(
+      {required this.searchTerm,
+      required this.pageNumber,
+      required this.pageSize});
+
+  @override
+  List<Object> get props => [searchTerm, pageNumber, pageSize];
+}

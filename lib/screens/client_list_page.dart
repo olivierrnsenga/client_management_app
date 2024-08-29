@@ -16,6 +16,7 @@ class ClientListPage extends StatefulWidget {
 
 class _ClientListPageState extends State<ClientListPage> {
   late ClientBloc _clientBloc;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -24,6 +25,15 @@ class _ClientListPageState extends State<ClientListPage> {
         ClientRepository(baseUrl: 'https://localhost:7137/api');
     _clientBloc = ClientBloc(clientRepository: clientRepository);
     _clientBloc.add(FetchClients(pageNumber: 1, pageSize: 10));
+
+    _searchController.addListener(() {
+      final searchTerm = _searchController.text;
+      _clientBloc.add(SearchClients(
+        searchTerm: searchTerm,
+        pageNumber: 1, // Starting at page 1 for search
+        pageSize: 10,
+      ));
+    });
   }
 
   @override
@@ -31,6 +41,20 @@ class _ClientListPageState extends State<ClientListPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Clients'),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(56.0),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Search clients',
+                prefixIcon: Icon(Icons.search),
+              ),
+            ),
+          ),
+        ),
       ),
       body: BlocBuilder<ClientBloc, ClientState>(
         bloc: _clientBloc,
@@ -101,6 +125,7 @@ class _ClientListPageState extends State<ClientListPage> {
   @override
   void dispose() {
     _clientBloc.close();
+    _searchController.dispose();
     super.dispose();
   }
 }
