@@ -38,4 +38,19 @@ class Client {
       dateOfBirth: json['dateOfBirth'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'clientID': clientID,
+      'firstName': firstName,
+      'lastName': lastName,
+      'email': email,
+      'phone': phone,
+      'address': address,
+      'city': city,
+      'state': state,
+      'zipCode': zipCode,
+      'dateOfBirth': dateOfBirth,
+    };
+  }
 }
