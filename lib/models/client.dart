@@ -53,4 +53,30 @@ class Client {
       'dateOfBirth': dateOfBirth,
     };
   }
+
+  Client copyWith({
+    int? clientID,
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? phone,
+    String? address,
+    String? city,
+    String? state,
+    String? zipCode,
+    String? dateOfBirth,
+  }) {
+    return Client(
+      clientID: clientID ?? this.clientID,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      address: address ?? this.address,
+      city: city ?? this.city,
+      state: state ?? this.state,
+      zipCode: zipCode ?? this.zipCode,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+    );
+  }
 }

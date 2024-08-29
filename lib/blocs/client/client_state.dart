@@ -27,6 +27,33 @@ class ClientLoaded extends ClientState {
   List<Object?> get props => [clients, totalCount, currentPage, totalPages];
 }
 
+class ClientAdded extends ClientState {
+  final Client client;
+
+  ClientAdded({required this.client});
+
+  @override
+  List<Object?> get props => [client];
+}
+
+class ClientUpdated extends ClientState {
+  final Client client;
+
+  ClientUpdated({required this.client});
+
+  @override
+  List<Object?> get props => [client];
+}
+
+class ClientDeleted extends ClientState {
+  final int clientID;
+
+  ClientDeleted({required this.clientID});
+
+  @override
+  List<Object?> get props => [clientID];
+}
+
 class ClientError extends ClientState {
   final String message;
 
