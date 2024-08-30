@@ -1,8 +1,17 @@
+import 'package:client_management_app/blocs/client/client_bloc.dart';
+import 'package:client_management_app/blocs/client/client_event.dart';
+import 'package:client_management_app/blocs/client/client_state.dart';
+import 'package:client_management_app/blocs/lawyer/lawyer_bloc.dart';
+import 'package:client_management_app/blocs/lawyer/lawyer_event.dart';
+import 'package:client_management_app/blocs/lawyer/lawyer_state.dart';
 import 'package:client_management_app/blocs/project/project_bloc.dart';
 import 'package:client_management_app/blocs/project/project_event.dart';
+import 'package:client_management_app/models/client/client.dart';
+import 'package:client_management_app/models/lawyer/lawyer.dart';
 import 'package:client_management_app/models/project/project.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class CreateProjectPage extends StatefulWidget {
   const CreateProjectPage({super.key});
@@ -21,6 +30,8 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
   late TextEditingController _clientIDController;
   late TextEditingController _lawyerIDController;
   late TextEditingController _statusIDController;
+  int? _selectedClientID;
+  int? _selectedLawyerID;
 
   @override
   void initState() {
@@ -53,8 +64,8 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
         description: _descriptionController.text,
         startDate: DateTime.parse(_startDateController.text),
         endDate: DateTime.parse(_endDateController.text),
-        clientID: int.parse(_clientIDController.text),
-        lawyerID: int.parse(_lawyerIDController.text),
+        clientID: _selectedClientID!,
+        lawyerID: _selectedLawyerID!,
         statusID: int.parse(_statusIDController.text),
       );
       context.read<ProjectBloc>().add(AddProject(project: newProject));
@@ -131,17 +142,75 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                     value?.isEmpty ?? true ? 'Please select end date' : null,
                 onTap: () => _selectDate(context, _endDateController),
               ),
-              TextFormField(
-                controller: _clientIDController,
-                decoration: const InputDecoration(labelText: 'Client ID'),
-                validator: (value) =>
-                    value?.isEmpty ?? true ? 'Please enter client ID' : null,
+              BlocBuilder<ClientBloc, ClientState>(
+                builder: (context, state) {
+                  return TypeAheadFormField<Client>(
+                    textFieldConfiguration: TextFieldConfiguration(
+                      controller: _clientIDController,
+                      decoration: const InputDecoration(labelText: 'Client'),
+                    ),
+                    suggestionsCallback: (pattern) async {
+                      context.read<ClientBloc>().add(SearchClients(
+                            searchTerm: pattern,
+                            pageNumber: 1,
+                            pageSize: 10,
+                          ));
+                      if (state is ClientLoaded) {
+                        return state.clients;
+                      }
+                      return [];
+                    },
+                    itemBuilder: (context, Client suggestion) {
+                      return ListTile(
+                        title: Text(suggestion.firstName),
+                      );
+                    },
+                    onSuggestionSelected: (Client suggestion) {
+                      _clientIDController.text = suggestion.firstName;
+                      _selectedClientID = suggestion.clientID;
+                    },
+                    noItemsFoundBuilder: (context) =>
+                        const Text('No clients found'),
+                    validator: (value) => value?.isEmpty ?? true
+                        ? 'Please select a client'
+                        : null,
+                  );
+                },
               ),
-              TextFormField(
-                controller: _lawyerIDController,
-                decoration: const InputDecoration(labelText: 'Lawyer ID'),
-                validator: (value) =>
-                    value?.isEmpty ?? true ? 'Please enter lawyer ID' : null,
+              BlocBuilder<LawyerBloc, LawyerState>(
+                builder: (context, state) {
+                  return TypeAheadFormField<Lawyer>(
+                    textFieldConfiguration: TextFieldConfiguration(
+                      controller: _lawyerIDController,
+                      decoration: const InputDecoration(labelText: 'Lawyer'),
+                    ),
+                    suggestionsCallback: (pattern) async {
+                      context.read<LawyerBloc>().add(SearchLawyers(
+                            searchTerm: pattern,
+                            pageNumber: 1,
+                            pageSize: 10,
+                          ));
+                      if (state is LawyerLoaded) {
+                        return state.lawyers;
+                      }
+                      return [];
+                    },
+                    itemBuilder: (context, Lawyer suggestion) {
+                      return ListTile(
+                        title: Text(suggestion.firstName),
+                      );
+                    },
+                    onSuggestionSelected: (Lawyer suggestion) {
+                      _lawyerIDController.text = suggestion.firstName;
+                      _selectedLawyerID = suggestion.lawyerID;
+                    },
+                    noItemsFoundBuilder: (context) =>
+                        const Text('No lawyers found'),
+                    validator: (value) => value?.isEmpty ?? true
+                        ? 'Please select a lawyer'
+                        : null,
+                  );
+                },
               ),
               TextFormField(
                 controller: _statusIDController,
