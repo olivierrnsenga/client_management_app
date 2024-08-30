@@ -155,17 +155,16 @@ class _CreateClientPageState extends State<CreateClientPage> {
               ),
               TextFormField(
                 controller: _dateOfBirthController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Date of Birth',
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.calendar_today),
-                    onPressed: () => _selectDate(context),
-                  ),
+                  suffixIcon: Icon(Icons.calendar_today),
                 ),
                 readOnly: true,
                 validator: (value) => value?.isEmpty ?? true
                     ? 'Please select date of birth'
                     : null,
+                onTap: () =>
+                    _selectDate(context), // This makes the whole field tappable
               ),
             ],
           ),
