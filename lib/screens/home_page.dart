@@ -1,5 +1,6 @@
 import 'package:client_management_app/screens/client/client_list_page.dart';
 import 'package:client_management_app/screens/lawyer_list_page.dart';
+import 'package:client_management_app/screens/project/project_list_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
@@ -50,6 +51,14 @@ class HomePage extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => const HomePage()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.file_copy_rounded),
+              title: const Text('Projects'),
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const ProjectListPage()));
               },
             ),
             ListTile(
