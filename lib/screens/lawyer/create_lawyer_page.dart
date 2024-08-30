@@ -1,6 +1,6 @@
-import 'package:client_management_app/blocs/client/lawyer/lawyer.dart';
-import 'package:client_management_app/blocs/client/lawyer/lawyer_bloc.dart';
-import 'package:client_management_app/blocs/client/lawyer/lawyer_event.dart';
+import 'package:client_management_app/blocs/lawyer/lawyer_bloc.dart';
+import 'package:client_management_app/blocs/lawyer/lawyer_event.dart';
+import 'package:client_management_app/models/lawyer/lawyer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

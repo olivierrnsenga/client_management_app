@@ -1,7 +1,7 @@
-import 'package:client_management_app/blocs/client/lawyer/lawyer.dart';
-import 'package:client_management_app/blocs/client/lawyer/lawyer_bloc.dart';
-import 'package:client_management_app/blocs/client/lawyer/lawyer_event.dart';
-import 'package:client_management_app/blocs/client/lawyer/lawyer_state.dart';
+import 'package:client_management_app/blocs/lawyer/lawyer_bloc.dart';
+import 'package:client_management_app/blocs/lawyer/lawyer_event.dart';
+import 'package:client_management_app/blocs/lawyer/lawyer_state.dart';
+import 'package:client_management_app/models/lawyer/lawyer.dart';
 import 'package:client_management_app/repositories/lawyer_repository.dart';
 import 'package:client_management_app/screens/lawyer/create_lawyer_page.dart';
 import 'package:client_management_app/widgets/pagination_controls.dart';

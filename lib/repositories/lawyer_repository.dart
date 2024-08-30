@@ -1,6 +1,7 @@
 import 'dart:convert';
-import 'package:client_management_app/blocs/client/lawyer/lawyer.dart';
-import 'package:client_management_app/blocs/client/lawyer/lawyer_response.dart';
+
+import 'package:client_management_app/models/lawyer/lawyer.dart';
+import 'package:client_management_app/models/lawyer/lawyer_response.dart';
 import 'package:http/http.dart' as http;
 
 class LawyerRepository {
