@@ -39,6 +39,10 @@ class ClientBloc extends Bloc<ClientEvent, ClientState> {
   ) async {
     emit(ClientLoading());
     try {
+      if (event.searchTerm.trim().length < 2) {
+        emit(ClientInitial());
+        return;
+      }
       final response = await clientRepository.searchClients(
         event.searchTerm,
         event.pageNumber,
