@@ -1,5 +1,6 @@
+import 'package:client_management_app/screens/client/client_list_page.dart';
+import 'package:client_management_app/screens/lawyer_list_page.dart';
 import 'package:flutter/material.dart';
-import 'package:client_management_app/screens/client_list_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -63,7 +64,8 @@ class HomePage extends StatelessWidget {
               leading: const Icon(Icons.gavel),
               title: const Text('Lawyers'),
               onTap: () {
-                // Navigate to Lawyers page
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const LawyerListPage()));
               },
             ),
           ],

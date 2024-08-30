@@ -1,13 +1,13 @@
-import 'package:client_management_app/screens/create_client_page.dart';
+import 'package:client_management_app/blocs/client/client_bloc.dart';
+import 'package:client_management_app/blocs/client/client_event.dart';
+import 'package:client_management_app/blocs/client/client_state.dart';
+import 'package:client_management_app/models/client/client.dart';
+import 'package:client_management_app/repositories/client_repository.dart';
+import 'package:client_management_app/screens/client/create_client_page.dart';
+import 'package:client_management_app/screens/client/edit_client_page.dart';
+import 'package:client_management_app/widgets/pagination_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/client/client_bloc.dart';
-import '../blocs/client/client_event.dart';
-import '../blocs/client/client_state.dart';
-import '../repositories/client_repository.dart';
-import '../widgets/pagination_controls.dart';
-import '../models/client.dart';
-import 'edit_client_page.dart'; // Import the edit screen
 
 class ClientListPage extends StatefulWidget {
   const ClientListPage({super.key});

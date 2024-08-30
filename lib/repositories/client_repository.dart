@@ -1,7 +1,7 @@
 import 'dart:convert';
+import 'package:client_management_app/models/client/client.dart';
+import 'package:client_management_app/models/client/client_response.dart';
 import 'package:http/http.dart' as http;
-import 'package:client_management_app/models/client.dart';
-import 'package:client_management_app/models/client_response.dart';
 
 class ClientRepository {
   final String baseUrl;

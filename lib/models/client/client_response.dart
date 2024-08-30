@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'package:client_management_app/models/client.dart';
+
+import 'package:client_management_app/models/client/client.dart';
 
 class ClientResponse {
   final List<Client> clients;

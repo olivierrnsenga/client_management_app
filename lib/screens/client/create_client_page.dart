@@ -1,20 +1,18 @@
+import 'package:client_management_app/blocs/client/client_bloc.dart';
+import 'package:client_management_app/blocs/client/client_event.dart';
+import 'package:client_management_app/models/client/client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/client/client_bloc.dart';
-import '../blocs/client/client_event.dart';
-import '../models/client.dart';
 
-class EditClientPage extends StatefulWidget {
-  final Client client;
-
-  const EditClientPage({super.key, required this.client});
+class CreateClientPage extends StatefulWidget {
+  const CreateClientPage({super.key, client});
 
   @override
   // ignore: library_private_types_in_public_api
-  _EditClientPageState createState() => _EditClientPageState();
+  _CreateClientPageState createState() => _CreateClientPageState();
 }
 
-class _EditClientPageState extends State<EditClientPage> {
+class _CreateClientPageState extends State<CreateClientPage> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
@@ -29,16 +27,15 @@ class _EditClientPageState extends State<EditClientPage> {
   @override
   void initState() {
     super.initState();
-    _firstNameController = TextEditingController(text: widget.client.firstName);
-    _lastNameController = TextEditingController(text: widget.client.lastName);
-    _emailController = TextEditingController(text: widget.client.email);
-    _phoneController = TextEditingController(text: widget.client.phone);
-    _addressController = TextEditingController(text: widget.client.address);
-    _cityController = TextEditingController(text: widget.client.city);
-    _stateController = TextEditingController(text: widget.client.state);
-    _zipCodeController = TextEditingController(text: widget.client.zipCode);
-    _dateOfBirthController =
-        TextEditingController(text: widget.client.dateOfBirth);
+    _firstNameController = TextEditingController();
+    _lastNameController = TextEditingController();
+    _emailController = TextEditingController();
+    _phoneController = TextEditingController();
+    _addressController = TextEditingController();
+    _cityController = TextEditingController();
+    _stateController = TextEditingController();
+    _zipCodeController = TextEditingController();
+    _dateOfBirthController = TextEditingController();
   }
 
   @override
@@ -57,7 +54,8 @@ class _EditClientPageState extends State<EditClientPage> {
 
   void _saveClient() {
     if (_formKey.currentState?.validate() ?? false) {
-      final updatedClient = widget.client.copyWith(
+      final newClient = Client(
+        clientID: 0, // Assuming the server will assign the ID
         firstName: _firstNameController.text,
         lastName: _lastNameController.text,
         email: _emailController.text,
@@ -68,8 +66,8 @@ class _EditClientPageState extends State<EditClientPage> {
         zipCode: _zipCodeController.text,
         dateOfBirth: _dateOfBirthController.text,
       );
-      context.read<ClientBloc>().add(UpdateClient(client: updatedClient));
-      Navigator.pop(context);
+      context.read<ClientBloc>().add(AddClient(client: newClient));
+      Navigator.pop(context); // Go back to the client list page after saving
     }
   }
 
@@ -93,7 +91,7 @@ class _EditClientPageState extends State<EditClientPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Client'),
+        title: const Text('Create Client'),
         actions: [
           IconButton(
             icon: const Icon(Icons.save),
@@ -155,21 +153,18 @@ class _EditClientPageState extends State<EditClientPage> {
                 validator: (value) =>
                     value?.isEmpty ?? true ? 'Please enter zip code' : null,
               ),
-              GestureDetector(
-                onTap: () => _selectDate(context),
-                child: AbsorbPointer(
-                  child: TextFormField(
-                    controller: _dateOfBirthController,
-                    decoration: const InputDecoration(
-                      labelText: 'Date of Birth',
-                      suffixIcon: Icon(Icons.calendar_today),
-                    ),
-                    readOnly: true,
-                    validator: (value) => value?.isEmpty ?? true
-                        ? 'Please select date of birth'
-                        : null,
-                  ),
+              TextFormField(
+                controller: _dateOfBirthController,
+                decoration: const InputDecoration(
+                  labelText: 'Date of Birth',
+                  suffixIcon: Icon(Icons.calendar_today),
                 ),
+                readOnly: true,
+                validator: (value) => value?.isEmpty ?? true
+                    ? 'Please select date of birth'
+                    : null,
+                onTap: () =>
+                    _selectDate(context), // This makes the whole field tappable
               ),
             ],
           ),
