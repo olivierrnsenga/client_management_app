@@ -1,3 +1,4 @@
+import 'package:client_management_app/screens/create_client_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/client/client_bloc.dart';
@@ -162,19 +163,13 @@ class _ClientListPageState extends State<ClientListPage> {
   }
 
   void _addClient() {
-    final newClient = Client(
-      clientID: 0,
-      firstName: 'New',
-      lastName: 'Client',
-      email: 'new.client@example.com',
-      phone: '1234567890',
-      address: '123 New Street',
-      city: 'New City',
-      state: 'NC',
-      zipCode: '12345',
-      dateOfBirth: '2000-01-01',
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            const CreateClientPage(), // Removed the 'client' parameter
+      ),
     );
-    _clientBloc.add(AddClient(client: newClient));
   }
 
   void _updateClient(Client client) {
