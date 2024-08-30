@@ -6,7 +6,7 @@ import '../blocs/client/client_state.dart';
 import '../repositories/client_repository.dart';
 import '../widgets/pagination_controls.dart';
 import '../models/client.dart';
-import 'edit_client_page.dart'; // Import the new edit screen
+import 'edit_client_page.dart'; // Import the edit screen
 
 class ClientListPage extends StatefulWidget {
   const ClientListPage({super.key});
@@ -36,60 +36,6 @@ class _ClientListPageState extends State<ClientListPage> {
         pageSize: 10,
       ));
     });
-  }
-
-  void _addClient() {
-    final newClient = Client(
-      clientID: 0,
-      firstName: 'New',
-      lastName: 'Client',
-      email: 'new.client@example.com',
-      phone: '1234567890',
-      address: '123 New Street',
-      city: 'New City',
-      state: 'NC',
-      zipCode: '12345',
-      dateOfBirth: '2000-01-01',
-    );
-    _clientBloc.add(AddClient(client: newClient));
-  }
-
-  void _updateClient(Client client) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditClientPage(client: client),
-      ),
-    );
-  }
-
-  void _deleteClient(Client client) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirm Deletion'),
-          content: Text(
-            'Are you sure you want to delete ${client.firstName} ${client.lastName}?',
-          ),
-          actions: [
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            TextButton(
-              child: const Text('Delete'),
-              onPressed: () {
-                _clientBloc.add(DeleteClient(clientID: client.clientID));
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
@@ -126,45 +72,84 @@ class _ClientListPageState extends State<ClientListPage> {
           } else if (state is ClientLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is ClientLoaded) {
-            return Center(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text('First Name')),
-                    DataColumn(label: Text('Last Name')),
-                    DataColumn(label: Text('Email')),
-                    DataColumn(label: Text('Phone')),
-                    DataColumn(label: Text('City')),
-                    DataColumn(label: Text('Actions')),
-                  ],
-                  rows: state.clients.map((client) {
-                    return DataRow(
-                      cells: [
-                        DataCell(Text(client.firstName)),
-                        DataCell(Text(client.lastName)),
-                        DataCell(Text(client.email)),
-                        DataCell(Text(client.phone)),
-                        DataCell(Text(client.city)),
-                        DataCell(
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit),
-                                onPressed: () => _updateClient(client),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.delete),
-                                onPressed: () => _deleteClient(client),
-                              ),
-                            ],
-                          ),
-                        ),
+            return Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      columns: const [
+                        DataColumn(label: Text('First Name')),
+                        DataColumn(label: Text('Last Name')),
+                        DataColumn(label: Text('Email')),
+                        DataColumn(label: Text('Phone')),
+                        DataColumn(label: Text('City')),
+                        DataColumn(label: Text('Actions')),
                       ],
-                    );
-                  }).toList(),
+                      rows: state.clients.map((client) {
+                        return DataRow(
+                          cells: [
+                            DataCell(Text(client.firstName)),
+                            DataCell(Text(client.lastName)),
+                            DataCell(Text(client.email)),
+                            DataCell(Text(client.phone)),
+                            DataCell(Text(client.city)),
+                            DataCell(
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit),
+                                    onPressed: () => _updateClient(client),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    onPressed: () => _deleteClient(client),
+                                  ),
+                                  PopupMenuButton<String>(
+                                    onSelected: (String value) {
+                                      switch (value) {
+                                        case 'Email':
+                                          // Implement emailing functionality
+                                          break;
+                                        case 'Phone':
+                                          // Implement phone functionality
+                                          break;
+                                        default:
+                                      }
+                                    },
+                                    itemBuilder: (BuildContext context) =>
+                                        <PopupMenuEntry<String>>[
+                                      const PopupMenuItem<String>(
+                                        value: 'Email',
+                                        child: Text('Email'),
+                                      ),
+                                      const PopupMenuItem<String>(
+                                        value: 'Phone',
+                                        child: Text('Phone'),
+                                      ),
+                                    ],
+                                    icon: const Icon(Icons.more_vert),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                  ),
                 ),
-              ),
+                PaginationControls(
+                  currentPage: state.currentPage,
+                  totalPages: state.totalPages,
+                  totalCount: state.totalCount,
+                  onPageChanged: (pageNumber) {
+                    _clientBloc.add(
+                        FetchClients(pageNumber: pageNumber, pageSize: 10));
+                  },
+                ),
+              ],
             );
           } else if (state is ClientError) {
             return Center(child: Text(state.message));
@@ -173,23 +158,57 @@ class _ClientListPageState extends State<ClientListPage> {
           }
         },
       ),
-      bottomNavigationBar: BlocBuilder<ClientBloc, ClientState>(
-        bloc: _clientBloc,
-        builder: (context, state) {
-          if (state is ClientLoaded) {
-            return PaginationControls(
-              currentPage: state.currentPage,
-              totalPages: state.totalPages,
-              totalCount: state.totalCount,
-              onPageChanged: (pageNumber) {
-                _clientBloc
-                    .add(FetchClients(pageNumber: pageNumber, pageSize: 10));
-              },
-            );
-          }
-          return const SizedBox.shrink();
-        },
+    );
+  }
+
+  void _addClient() {
+    final newClient = Client(
+      clientID: 0,
+      firstName: 'New',
+      lastName: 'Client',
+      email: 'new.client@example.com',
+      phone: '1234567890',
+      address: '123 New Street',
+      city: 'New City',
+      state: 'NC',
+      zipCode: '12345',
+      dateOfBirth: '2000-01-01',
+    );
+    _clientBloc.add(AddClient(client: newClient));
+  }
+
+  void _updateClient(Client client) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditClientPage(client: client),
       ),
+    );
+  }
+
+  void _deleteClient(Client client) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Deletion'),
+          content: Text(
+              'Are you sure you want to delete ${client.firstName} ${client.lastName}?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _clientBloc.add(DeleteClient(clientID: client.clientID));
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -155,19 +155,21 @@ class _EditClientPageState extends State<EditClientPage> {
                 validator: (value) =>
                     value?.isEmpty ?? true ? 'Please enter zip code' : null,
               ),
-              TextFormField(
-                controller: _dateOfBirthController,
-                decoration: InputDecoration(
-                  labelText: 'Date of Birth',
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.calendar_today),
-                    onPressed: () => _selectDate(context),
+              GestureDetector(
+                onTap: () => _selectDate(context),
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    controller: _dateOfBirthController,
+                    decoration: const InputDecoration(
+                      labelText: 'Date of Birth',
+                      suffixIcon: Icon(Icons.calendar_today),
+                    ),
+                    readOnly: true,
+                    validator: (value) => value?.isEmpty ?? true
+                        ? 'Please select date of birth'
+                        : null,
                   ),
                 ),
-                readOnly: true,
-                validator: (value) => value?.isEmpty ?? true
-                    ? 'Please select date of birth'
-                    : null,
               ),
             ],
           ),
