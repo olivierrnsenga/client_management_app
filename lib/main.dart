@@ -1,4 +1,4 @@
-import 'package:client_management_app/blocs/User/user_bloc.dart';
+import 'package:client_management_app/blocs/user/user_bloc.dart';
 import 'package:client_management_app/repositories/user_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,11 +27,12 @@ class MyApp extends StatelessWidget {
   final LawyerRepository lawyerRepository;
   final UserRepository userRepository;
 
-  const MyApp(
-      {super.key,
-      required this.clientRepository,
-      required this.lawyerRepository,
-      required this.userRepository});
+  const MyApp({
+    super.key,
+    required this.clientRepository,
+    required this.lawyerRepository,
+    required this.userRepository,
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -24,7 +24,7 @@ class UserRepository {
   }
 
   Future<User> getUser(int id) async {
-    final response = await http.get(Uri.parse('$baseUrl/users/$id'));
+    final response = await http.get(Uri.parse('$baseUrl/user/$id'));
     if (response.statusCode == 200) {
       return User.fromJson(json.decode(response.body));
     } else {
@@ -34,7 +34,7 @@ class UserRepository {
 
   Future<User> addUser(User user) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/users'),
+      Uri.parse('$baseUrl/user'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode(user.toJson()),
     );
@@ -47,7 +47,7 @@ class UserRepository {
 
   Future<void> updateUser(int id, User user) async {
     final response = await http.put(
-      Uri.parse('$baseUrl/users/$id'),
+      Uri.parse('$baseUrl/user/$id'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode(user.toJson()),
     );
@@ -66,7 +66,7 @@ class UserRepository {
   Future<UserResponse> searchUsers(
       String searchTerm, int pageNumber, int pageSize) async {
     final uri = Uri.parse(
-      '$baseUrl/users/search?searchTerm=$searchTerm&pageNumber=$pageNumber&pageSize=$pageSize',
+      '$baseUrl/user/search?searchTerm=$searchTerm&pageNumber=$pageNumber&pageSize=$pageSize',
     );
 
     final response = await http.get(uri);
