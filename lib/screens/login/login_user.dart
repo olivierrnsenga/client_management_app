@@ -45,13 +45,9 @@ class _LoginPageState extends State<LoginPage> {
           username: _usernameController.text,
           password: _passwordController.text,
         );
+        // ignore: unused_local_variable
         final response = await widget.userRepository.loginUser(userLoginDto);
 
-        // Handle the token, e.g., store it securely
-        // For now, we'll just print it
-
-        // Navigate to the home page
-        // ignore: use_build_context_synchronously
         Navigator.pushReplacementNamed(context, '/home');
       } catch (e) {
         setState(() {
