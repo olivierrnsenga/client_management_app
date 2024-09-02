@@ -1,5 +1,6 @@
 import 'package:client_management_app/blocs/user/user_bloc.dart';
 import 'package:client_management_app/repositories/user_repository.dart';
+import 'package:client_management_app/screens/login/login_user.dart'; // Adjust this import path if necessary
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'blocs/client/client_bloc.dart';
@@ -48,9 +49,16 @@ class MyApp extends StatelessWidget {
           create: (context) => UserBloc(userRepository: userRepository),
         ),
       ],
-      child: const MaterialApp(
+      child: MaterialApp(
         title: 'Client Management',
-        home: HomePage(), // HomePage will contain the header and sidebar
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: LoginPage(userRepository: userRepository), // Start with LoginPage
+        routes: {
+          '/home': (context) =>
+              const HomePage(), // Define a route for the home page
+        },
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:client_management_app/blocs/Login/user_login_dto.dart';
 import 'package:client_management_app/models/user/user.dart';
 import 'package:client_management_app/models/user/user_response.dart';
 import 'package:http/http.dart' as http;
@@ -57,7 +58,7 @@ class UserRepository {
   }
 
   Future<void> deleteUser(int id) async {
-    final response = await http.delete(Uri.parse('$baseUrl/users/$id'));
+    final response = await http.delete(Uri.parse('$baseUrl/user/$id'));
     if (response.statusCode != 204) {
       throw Exception('Failed to delete user');
     }
@@ -78,6 +79,23 @@ class UserRepository {
       return UserResponse.fromJson(jsonResponse, paginationHeader);
     } else {
       throw Exception('Failed to search users');
+    }
+  }
+
+  Future<LoginResponse> loginUser(UserLoginDto userLoginDto) async {
+    final url = Uri.parse('$baseUrl/User/login');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(userLoginDto.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      return LoginResponse.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to login');
     }
   }
 }
