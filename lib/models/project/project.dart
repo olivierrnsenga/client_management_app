@@ -4,8 +4,8 @@ class Project {
   final String description;
   final DateTime startDate;
   final DateTime endDate;
-  final int clientID;
-  final int lawyerID;
+  final List<int> clientIDs; // List of client IDs
+  final List<int> lawyerIDs; // List of lawyer IDs
   final int statusID;
 
   Project({
@@ -14,8 +14,8 @@ class Project {
     required this.description,
     required this.startDate,
     required this.endDate,
-    required this.clientID,
-    required this.lawyerID,
+    required this.clientIDs, // Updated to accept a list of IDs
+    required this.lawyerIDs, // Updated to accept a list of IDs
     required this.statusID,
   });
 
@@ -30,21 +30,21 @@ class Project {
       endDate: json['endDate'] != null
           ? DateTime.parse(json['endDate'])
           : DateTime.now(),
-      clientID: json['clientID'] as int? ?? 0,
-      lawyerID: json['lawyerID'] as int? ?? 0,
+      clientIDs: List<int>.from(json['clientIDs'] ?? []), // Parse list of IDs
+      lawyerIDs: List<int>.from(json['lawyerIDs'] ?? []), // Parse list of IDs
       statusID: json['statusID'] as int? ?? 0,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'projectID': projectID,
+      'projectID': projectID ?? 0, // Provide a default value if null
       'projectName': projectName,
       'description': description,
       'startDate': startDate.toIso8601String(),
       'endDate': endDate.toIso8601String(),
-      'clientID': clientID,
-      'lawyerID': lawyerID,
+      'clientIDs': clientIDs, // Convert list of client IDs to JSON
+      'lawyerIDs': lawyerIDs, // Convert list of lawyer IDs to JSON
       'statusID': statusID,
     };
   }
@@ -55,8 +55,8 @@ class Project {
     String? description,
     DateTime? startDate,
     DateTime? endDate,
-    int? clientID,
-    int? lawyerID,
+    List<int>? clientIDs, // Updated to accept a list of IDs
+    List<int>? lawyerIDs, // Updated to accept a list of IDs
     int? statusID,
   }) {
     return Project(
@@ -65,8 +65,8 @@ class Project {
       description: description ?? this.description,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
-      clientID: clientID ?? this.clientID,
-      lawyerID: lawyerID ?? this.lawyerID,
+      clientIDs: clientIDs ?? this.clientIDs, // Use new or existing list
+      lawyerIDs: lawyerIDs ?? this.lawyerIDs, // Use new or existing list
       statusID: statusID ?? this.statusID,
     );
   }

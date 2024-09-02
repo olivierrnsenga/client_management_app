@@ -67,10 +67,8 @@ class ProjectDetailsPage extends StatelessWidget {
               'Start Date', project.startDate.toString(), Icons.calendar_today),
           _buildDetailCard(
               'End Date', project.endDate.toString(), Icons.calendar_today),
-          _buildDetailCard(
-              'Client ID', project.clientID.toString(), Icons.person),
-          _buildDetailCard(
-              'Lawyer ID', project.lawyerID.toString(), Icons.person_outline),
+          _buildClientsDetailCard(),
+          _buildLawyersDetailCard(),
           _buildDetailCard(
               'Status ID', project.statusID.toString(), Icons.info),
         ],
@@ -110,6 +108,96 @@ class ProjectDetailsPage extends StatelessWidget {
                   color: Colors.black54,
                 ),
                 textAlign: TextAlign.right,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildClientsDetailCard() {
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.person, color: Colors.blueAccent),
+            const SizedBox(width: 10),
+            const Expanded(
+              child: Text(
+                'Client IDs',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: project.clientIDs
+                    .map((id) => Text(
+                          'Client ID: $id',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.black54,
+                          ),
+                        ))
+                    .toList(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLawyersDetailCard() {
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.person_outline, color: Colors.blueAccent),
+            const SizedBox(width: 10),
+            const Expanded(
+              child: Text(
+                'Lawyer IDs',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: project.lawyerIDs
+                    .map((id) => Text(
+                          'Lawyer ID: $id',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.black54,
+                          ),
+                        ))
+                    .toList(),
               ),
             ),
           ],

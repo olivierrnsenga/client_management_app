@@ -25,8 +25,7 @@ class _ProjectListPageState extends State<ProjectListPage> {
   @override
   void initState() {
     super.initState();
-    final projectRepository =
-        ProjectRepository(baseUrl: 'https://localhost:7137/api');
+    final projectRepository = RepositoryProvider.of<ProjectRepository>(context);
     _projectBloc = ProjectBloc(projectRepository: projectRepository);
     _projectBloc.add(FetchProjects(pageNumber: 1, pageSize: 10));
 
@@ -85,8 +84,8 @@ class _ProjectListPageState extends State<ProjectListPage> {
                         DataColumn(label: Text('Description')),
                         DataColumn(label: Text('Start Date')),
                         DataColumn(label: Text('End Date')),
-                        DataColumn(label: Text('Client ID')),
-                        DataColumn(label: Text('Lawyer ID')),
+                        DataColumn(label: Text('Client IDs')),
+                        DataColumn(label: Text('Lawyer IDs')),
                         DataColumn(label: Text('Status ID')),
                         DataColumn(label: Text('Actions')),
                       ],
@@ -120,13 +119,13 @@ class _ProjectListPageState extends State<ProjectListPage> {
                             DataCell(
                               GestureDetector(
                                 onTap: () => _showProjectDetails(project),
-                                child: Text(project.clientID.toString()),
+                                child: Text(project.clientIDs.join(', ')),
                               ),
                             ),
                             DataCell(
                               GestureDetector(
                                 onTap: () => _showProjectDetails(project),
-                                child: Text(project.lawyerID.toString()),
+                                child: Text(project.lawyerIDs.join(', ')),
                               ),
                             ),
                             DataCell(
@@ -186,7 +185,10 @@ class _ProjectListPageState extends State<ProjectListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const CreateProjectPage(),
+        builder: (context) => BlocProvider<ProjectBloc>.value(
+          value: _projectBloc,
+          child: const CreateProjectPage(),
+        ),
       ),
     );
   }
@@ -195,7 +197,10 @@ class _ProjectListPageState extends State<ProjectListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditProjectPage(project: project),
+        builder: (context) => BlocProvider<ProjectBloc>.value(
+          value: _projectBloc,
+          child: EditProjectPage(project: project),
+        ),
       ),
     );
   }
@@ -230,7 +235,10 @@ class _ProjectListPageState extends State<ProjectListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ProjectDetailsPage(project: project),
+        builder: (context) => BlocProvider<ProjectBloc>.value(
+          value: _projectBloc,
+          child: ProjectDetailsPage(project: project),
+        ),
       ),
     );
   }

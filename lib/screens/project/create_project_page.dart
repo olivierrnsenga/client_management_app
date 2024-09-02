@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client_management_app/blocs/client/client_bloc.dart';
 import 'package:client_management_app/blocs/client/client_event.dart';
 import 'package:client_management_app/blocs/client/client_state.dart';
@@ -9,8 +11,6 @@ import 'package:client_management_app/blocs/project/project_event.dart';
 import 'package:client_management_app/models/client/client.dart';
 import 'package:client_management_app/models/lawyer/lawyer.dart';
 import 'package:client_management_app/models/project/project.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class CreateProjectPage extends StatefulWidget {
@@ -27,11 +27,10 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
   late TextEditingController _descriptionController;
   late TextEditingController _startDateController;
   late TextEditingController _endDateController;
-  late TextEditingController _clientIDController;
-  late TextEditingController _lawyerIDController;
-  late TextEditingController _statusIDController;
-  int? _selectedClientID;
-  int? _selectedLawyerID;
+  late TextEditingController _clientSearchController;
+  late TextEditingController _lawyerSearchController;
+  final List<Client> _selectedClients = [];
+  final List<Lawyer> _selectedLawyers = [];
 
   @override
   void initState() {
@@ -40,9 +39,8 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
     _descriptionController = TextEditingController();
     _startDateController = TextEditingController();
     _endDateController = TextEditingController();
-    _clientIDController = TextEditingController();
-    _lawyerIDController = TextEditingController();
-    _statusIDController = TextEditingController();
+    _clientSearchController = TextEditingController();
+    _lawyerSearchController = TextEditingController();
   }
 
   @override
@@ -51,9 +49,8 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
     _descriptionController.dispose();
     _startDateController.dispose();
     _endDateController.dispose();
-    _clientIDController.dispose();
-    _lawyerIDController.dispose();
-    _statusIDController.dispose();
+    _clientSearchController.dispose();
+    _lawyerSearchController.dispose();
     super.dispose();
   }
 
@@ -64,12 +61,12 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
         description: _descriptionController.text,
         startDate: DateTime.parse(_startDateController.text),
         endDate: DateTime.parse(_endDateController.text),
-        clientID: _selectedClientID!,
-        lawyerID: _selectedLawyerID!,
-        statusID: int.parse(_statusIDController.text),
+        clientIDs: _selectedClients.map((client) => client.clientID).toList(),
+        lawyerIDs: _selectedLawyers.map((lawyer) => lawyer.lawyerID).toList(),
+        statusID: 1, // Example status ID, adjust as needed
       );
       context.read<ProjectBloc>().add(AddProject(project: newProject));
-      Navigator.pop(context); // Go back to the project list page after saving
+      Navigator.pop(context);
     }
   }
 
@@ -142,78 +139,107 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                     value?.isEmpty ?? true ? 'Please select end date' : null,
                 onTap: () => _selectDate(context, _endDateController),
               ),
-              BlocBuilder<ClientBloc, ClientState>(
-                builder: (context, state) {
-                  return TypeAheadFormField<Client>(
-                    textFieldConfiguration: TextFieldConfiguration(
-                      controller: _clientIDController,
-                      decoration: const InputDecoration(labelText: 'Client'),
-                    ),
-                    suggestionsCallback: (pattern) async {
-                      context.read<ClientBloc>().add(SearchClients(
-                            searchTerm: pattern,
-                            pageNumber: 1,
-                            pageSize: 10,
-                          ));
-                      if (state is ClientLoaded) {
-                        return state.clients;
-                      }
-                      return [];
+              const SizedBox(height: 16.0),
+              Wrap(
+                spacing: 8.0,
+                children: _selectedClients.map((client) {
+                  return Chip(
+                    label: Text('${client.firstName} ${client.lastName}'),
+                    onDeleted: () {
+                      setState(() {
+                        _selectedClients.remove(client);
+                      });
                     },
-                    itemBuilder: (context, Client suggestion) {
-                      return ListTile(
-                        title: Text(suggestion.firstName),
-                      );
-                    },
-                    onSuggestionSelected: (Client suggestion) {
-                      _clientIDController.text = suggestion.firstName;
-                      _selectedClientID = suggestion.clientID;
-                    },
-                    noItemsFoundBuilder: (context) =>
-                        const Text('No clients found'),
-                    validator: (value) => value?.isEmpty ?? true
-                        ? 'Please select a client'
-                        : null,
+                  );
+                }).toList(),
+              ),
+              TypeAheadFormField<Client>(
+                textFieldConfiguration: TextFieldConfiguration(
+                  controller: _clientSearchController,
+                  decoration: const InputDecoration(
+                    labelText: 'Search Client',
+                    suffixIcon: Icon(Icons.search),
+                  ),
+                ),
+                suggestionsCallback: (pattern) async {
+                  context.read<ClientBloc>().add(SearchClients(
+                        searchTerm: pattern,
+                        pageNumber: 1,
+                        pageSize: 10,
+                      ));
+                  if (context.read<ClientBloc>().state is ClientLoaded) {
+                    return (context.read<ClientBloc>().state as ClientLoaded)
+                        .clients;
+                  }
+                  return [];
+                },
+                itemBuilder: (context, Client suggestion) {
+                  return ListTile(
+                    title:
+                        Text('${suggestion.firstName} ${suggestion.lastName}'),
                   );
                 },
+                onSuggestionSelected: (Client selectedClient) {
+                  setState(() {
+                    _selectedClients.add(selectedClient);
+                    _clientSearchController.clear();
+                  });
+                },
+                noItemsFoundBuilder: (context) =>
+                    const Text('No clients found'),
               ),
-              BlocBuilder<LawyerBloc, LawyerState>(
-                builder: (context, state) {
-                  return TypeAheadFormField<Lawyer>(
-                    textFieldConfiguration: TextFieldConfiguration(
-                      controller: _lawyerIDController,
-                      decoration: const InputDecoration(labelText: 'Lawyer'),
-                    ),
-                    suggestionsCallback: (pattern) async {
-                      context.read<LawyerBloc>().add(SearchLawyers(
-                            searchTerm: pattern,
-                            pageNumber: 1,
-                            pageSize: 10,
-                          ));
-                      if (state is LawyerLoaded) {
-                        return state.lawyers;
-                      }
-                      return [];
+              const SizedBox(height: 16.0),
+              Wrap(
+                spacing: 8.0,
+                children: _selectedLawyers.map((lawyer) {
+                  return Chip(
+                    label: Text('${lawyer.firstName} ${lawyer.lastName}'),
+                    onDeleted: () {
+                      setState(() {
+                        _selectedLawyers.remove(lawyer);
+                      });
                     },
-                    itemBuilder: (context, Lawyer suggestion) {
-                      return ListTile(
-                        title: Text(suggestion.firstName),
-                      );
-                    },
-                    onSuggestionSelected: (Lawyer suggestion) {
-                      _lawyerIDController.text = suggestion.firstName;
-                      _selectedLawyerID = suggestion.lawyerID;
-                    },
-                    noItemsFoundBuilder: (context) =>
-                        const Text('No lawyers found'),
-                    validator: (value) => value?.isEmpty ?? true
-                        ? 'Please select a lawyer'
-                        : null,
+                  );
+                }).toList(),
+              ),
+              TypeAheadFormField<Lawyer>(
+                textFieldConfiguration: TextFieldConfiguration(
+                  controller: _lawyerSearchController,
+                  decoration: const InputDecoration(
+                    labelText: 'Search Lawyer',
+                    suffixIcon: Icon(Icons.search),
+                  ),
+                ),
+                suggestionsCallback: (pattern) async {
+                  context.read<LawyerBloc>().add(SearchLawyers(
+                        searchTerm: pattern,
+                        pageNumber: 1,
+                        pageSize: 10,
+                      ));
+                  if (context.read<LawyerBloc>().state is LawyerLoaded) {
+                    return (context.read<LawyerBloc>().state as LawyerLoaded)
+                        .lawyers;
+                  }
+                  return [];
+                },
+                itemBuilder: (context, Lawyer suggestion) {
+                  return ListTile(
+                    title:
+                        Text('${suggestion.firstName} ${suggestion.lastName}'),
                   );
                 },
+                onSuggestionSelected: (Lawyer selectedLawyer) {
+                  setState(() {
+                    _selectedLawyers.add(selectedLawyer);
+                    _lawyerSearchController.clear();
+                  });
+                },
+                noItemsFoundBuilder: (context) =>
+                    const Text('No lawyers found'),
               ),
+              const SizedBox(height: 16.0),
               TextFormField(
-                controller: _statusIDController,
+                controller: _startDateController,
                 decoration: const InputDecoration(labelText: 'Status ID'),
                 validator: (value) =>
                     value?.isEmpty ?? true ? 'Please enter status ID' : null,

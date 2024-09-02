@@ -20,9 +20,10 @@ class _EditProjectPageState extends State<EditProjectPage> {
   late TextEditingController _descriptionController;
   late TextEditingController _startDateController;
   late TextEditingController _endDateController;
-  late TextEditingController _clientIDController;
-  late TextEditingController _lawyerIDController;
   late TextEditingController _statusIDController;
+
+  final List<int> _selectedClientIDs = [];
+  final List<int> _selectedLawyerIDs = [];
 
   @override
   void initState() {
@@ -35,12 +36,12 @@ class _EditProjectPageState extends State<EditProjectPage> {
         TextEditingController(text: widget.project.startDate.toIso8601String());
     _endDateController =
         TextEditingController(text: widget.project.endDate.toIso8601String());
-    _clientIDController =
-        TextEditingController(text: widget.project.clientID.toString());
-    _lawyerIDController =
-        TextEditingController(text: widget.project.lawyerID.toString());
     _statusIDController =
         TextEditingController(text: widget.project.statusID.toString());
+
+    // Initialize with existing clientIDs and lawyerIDs
+    _selectedClientIDs.addAll(widget.project.clientIDs);
+    _selectedLawyerIDs.addAll(widget.project.lawyerIDs);
   }
 
   @override
@@ -49,8 +50,6 @@ class _EditProjectPageState extends State<EditProjectPage> {
     _descriptionController.dispose();
     _startDateController.dispose();
     _endDateController.dispose();
-    _clientIDController.dispose();
-    _lawyerIDController.dispose();
     _statusIDController.dispose();
     super.dispose();
   }
@@ -62,8 +61,8 @@ class _EditProjectPageState extends State<EditProjectPage> {
         description: _descriptionController.text,
         startDate: DateTime.parse(_startDateController.text),
         endDate: DateTime.parse(_endDateController.text),
-        clientID: int.parse(_clientIDController.text),
-        lawyerID: int.parse(_lawyerIDController.text),
+        clientIDs: _selectedClientIDs, // Use list of client IDs
+        lawyerIDs: _selectedLawyerIDs, // Use list of lawyer IDs
         statusID: int.parse(_statusIDController.text),
       );
       context.read<ProjectBloc>().add(UpdateProject(project: updatedProject));
@@ -140,18 +139,41 @@ class _EditProjectPageState extends State<EditProjectPage> {
                     value?.isEmpty ?? true ? 'Please select end date' : null,
                 onTap: () => _selectDate(context, _endDateController),
               ),
-              TextFormField(
-                controller: _clientIDController,
-                decoration: const InputDecoration(labelText: 'Client ID'),
-                validator: (value) =>
-                    value?.isEmpty ?? true ? 'Please enter client ID' : null,
+              const SizedBox(height: 16.0),
+              Wrap(
+                spacing: 8.0,
+                children: _selectedClientIDs.map((clientID) {
+                  return Chip(
+                    label: Text(
+                        'Client $clientID'), // You can enhance this to show client names
+                    onDeleted: () {
+                      setState(() {
+                        _selectedClientIDs.remove(clientID);
+                      });
+                    },
+                  );
+                }).toList(),
               ),
-              TextFormField(
-                controller: _lawyerIDController,
-                decoration: const InputDecoration(labelText: 'Lawyer ID'),
-                validator: (value) =>
-                    value?.isEmpty ?? true ? 'Please enter lawyer ID' : null,
+              // Similarly add Autocomplete for selecting and adding clients
+
+              const SizedBox(height: 16.0),
+              Wrap(
+                spacing: 8.0,
+                children: _selectedLawyerIDs.map((lawyerID) {
+                  return Chip(
+                    label: Text(
+                        'Lawyer $lawyerID'), // You can enhance this to show lawyer names
+                    onDeleted: () {
+                      setState(() {
+                        _selectedLawyerIDs.remove(lawyerID);
+                      });
+                    },
+                  );
+                }).toList(),
               ),
+              // Similarly add Autocomplete for selecting and adding lawyers
+
+              const SizedBox(height: 16.0),
               TextFormField(
                 controller: _statusIDController,
                 decoration: const InputDecoration(labelText: 'Status ID'),

@@ -1,4 +1,6 @@
 import 'package:client_management_app/blocs/document/document_bloc.dart';
+import 'package:client_management_app/blocs/project/project_bloc.dart';
+import 'package:client_management_app/repositories/project_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'blocs/client/client_bloc.dart';
@@ -54,6 +56,12 @@ class MyApp extends StatelessWidget {
               return DocumentRepository(baseUrl: config.baseUrl);
             },
           ),
+          RepositoryProvider<ProjectRepository>(
+            create: (context) {
+              final config = RepositoryProvider.of<AppConfig>(context);
+              return ProjectRepository(baseUrl: config.baseUrl);
+            },
+          ),
         ],
         child: MultiBlocProvider(
           providers: [
@@ -78,6 +86,13 @@ class MyApp extends StatelessWidget {
               create: (context) => DocumentBloc(
                 documentRepository:
                     RepositoryProvider.of<DocumentRepository>(context),
+              ),
+            ),
+            BlocProvider<ProjectBloc>(
+              // Add ProjectBloc here
+              create: (context) => ProjectBloc(
+                projectRepository:
+                    RepositoryProvider.of<ProjectRepository>(context),
               ),
             ),
           ],
