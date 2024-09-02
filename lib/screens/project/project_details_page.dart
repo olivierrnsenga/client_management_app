@@ -45,19 +45,25 @@ class ProjectDetailsPage extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       child: ListView(
         children: [
-          _buildDetailCard('Project Name', project.projectName),
-          _buildDetailCard('Description', project.description),
-          _buildDetailCard('Start Date', project.startDate.toString()),
-          _buildDetailCard('End Date', project.endDate.toString()),
-          _buildDetailCard('Client ID', project.clientID.toString()),
-          _buildDetailCard('Lawyer ID', project.lawyerID.toString()),
-          _buildDetailCard('Status ID', project.statusID.toString()),
+          _buildDetailCard('Project Name', project.projectName, Icons.business),
+          _buildDetailCard(
+              'Description', project.description, Icons.description),
+          _buildDetailCard(
+              'Start Date', project.startDate.toString(), Icons.calendar_today),
+          _buildDetailCard(
+              'End Date', project.endDate.toString(), Icons.calendar_today),
+          _buildDetailCard(
+              'Client ID', project.clientID.toString(), Icons.person),
+          _buildDetailCard(
+              'Lawyer ID', project.lawyerID.toString(), Icons.person_outline),
+          _buildDetailCard(
+              'Status ID', project.statusID.toString(), Icons.info),
         ],
       ),
     );
   }
 
-  Widget _buildDetailCard(String label, String value) {
+  Widget _buildDetailCard(String label, String value, IconData icon) {
     return Card(
       elevation: 4,
       margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -68,6 +74,8 @@ class ProjectDetailsPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Row(
           children: [
+            Icon(icon, color: Colors.blueAccent),
+            const SizedBox(width: 10),
             Expanded(
               child: Text(
                 label,
