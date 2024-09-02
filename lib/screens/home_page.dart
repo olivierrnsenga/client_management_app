@@ -1,6 +1,7 @@
 import 'package:client_management_app/screens/client/client_list_page.dart';
 import 'package:client_management_app/screens/lawyer/lawyer_list_page.dart';
 import 'package:client_management_app/screens/project/project_list_page.dart';
+import 'package:client_management_app/screens/user/user_list_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
@@ -75,6 +76,14 @@ class HomePage extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => const LawyerListPage()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.people),
+              title: const Text('Users'),
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const UserListPage()));
               },
             ),
           ],
