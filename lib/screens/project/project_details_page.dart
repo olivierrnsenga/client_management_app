@@ -1,3 +1,4 @@
+import 'package:client_management_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client_management_app/blocs/document/document_bloc.dart';
@@ -14,27 +15,40 @@ class ProjectDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Project Details: ${project.projectName}'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Details'),
-              Tab(text: 'Documents'),
-              Tab(text: 'Correspondence'),
-              Tab(text: 'Stakeholders'),
-            ],
+    return RepositoryProvider(
+      create: (context) {
+        final config = RepositoryProvider.of<AppConfig>(context);
+        return DocumentRepository(baseUrl: config.baseUrl);
+      },
+      child: BlocProvider(
+        create: (context) => DocumentBloc(
+            documentRepository:
+                RepositoryProvider.of<DocumentRepository>(context))
+          ..add(FetchDocuments(
+              projectId: project.projectID!, pageNumber: 1, pageSize: 10)),
+        child: DefaultTabController(
+          length: 4,
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text('Project Details: ${project.projectName}'),
+              bottom: const TabBar(
+                tabs: [
+                  Tab(text: 'Details'),
+                  Tab(text: 'Documents'),
+                  Tab(text: 'Correspondence'),
+                  Tab(text: 'Stakeholders'),
+                ],
+              ),
+            ),
+            body: TabBarView(
+              children: [
+                _buildProjectDetailsTab(),
+                _buildDocumentsTab(context),
+                _buildCorrespondenceTab(),
+                _buildStakeholdersTab(),
+              ],
+            ),
           ),
-        ),
-        body: TabBarView(
-          children: [
-            _buildProjectDetailsTab(),
-            _buildDocumentsTab(context),
-            _buildCorrespondenceTab(),
-            _buildStakeholdersTab(),
-          ],
         ),
       ),
     );
@@ -104,100 +118,90 @@ class ProjectDetailsPage extends StatelessWidget {
   }
 
   Widget _buildDocumentsTab(BuildContext context) {
-    return BlocProvider(
-      create: (_) => DocumentBloc(
-          documentRepository:
-              DocumentRepository(baseUrl: 'https://localhost:7137/api'))
-        ..add(FetchDocuments(
-            projectId: project.projectID!, pageNumber: 1, pageSize: 10)),
-      child: BlocBuilder<DocumentBloc, DocumentState>(
-        builder: (context, state) {
-          if (state is DocumentLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is DocumentLoaded) {
-            return Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: state.documents.length,
-                    itemBuilder: (context, index) {
-                      final document = state.documents[index];
-                      return Card(
-                        elevation: 3,
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 6),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+    return BlocBuilder<DocumentBloc, DocumentState>(
+      builder: (context, state) {
+        if (state is DocumentLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is DocumentLoaded) {
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  itemCount: state.documents.length,
+                  itemBuilder: (context, index) {
+                    final document = state.documents[index];
+                    return Card(
+                      elevation: 3,
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        leading: Icon(
+                          _getDocumentIcon(document.documentType),
+                          color: Colors.blueAccent,
                         ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          leading: Icon(
-                            _getDocumentIcon(document.documentType),
-                            color: Colors.blueAccent,
+                        title: Text(
+                          document.documentName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
                           ),
-                          title: Text(
-                            document.documentName,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
+                        ),
+                        subtitle: Text(
+                          document.documentType,
+                          style: const TextStyle(color: Colors.black54),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.blue),
+                              onPressed: () {
+                                _showDocumentEditDialog(context, document);
+                              },
                             ),
-                          ),
-                          subtitle: Text(
-                            document.documentType,
-                            style: const TextStyle(color: Colors.black54),
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon:
-                                    const Icon(Icons.edit, color: Colors.blue),
-                                onPressed: () {
-                                  _showDocumentEditDialog(context, document);
-                                },
-                              ),
-                              IconButton(
-                                icon:
-                                    const Icon(Icons.delete, color: Colors.red),
-                                onPressed: () {
-                                  context.read<DocumentBloc>().add(
-                                      DeleteDocument(
-                                          documentID: document.documentID!));
-                                },
-                              ),
-                            ],
-                          ),
-                          onTap: () {
-                            // Open the document or show details if necessary
-                          },
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () {
+                                context.read<DocumentBloc>().add(DeleteDocument(
+                                    documentID: document.documentID!));
+                              },
+                            ),
+                          ],
                         ),
-                      );
-                    },
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    _showDocumentCreateDialog(context);
+                        onTap: () {
+                          // Open the document or show details if necessary
+                        },
+                      ),
+                    );
                   },
-                  icon: const Icon(Icons.add),
-                  label: const Text('Add Document'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                ),
+              ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  _showDocumentCreateDialog(context);
+                },
+                icon: const Icon(Icons.add),
+                label: const Text('Add Document'),
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-              ],
-            );
-          } else if (state is DocumentError) {
-            return Center(child: Text(state.message));
-          } else {
-            return const Center(child: Text('No documents found.'));
-          }
-        },
-      ),
+              ),
+            ],
+          );
+        } else if (state is DocumentError) {
+          return Center(child: Text(state.message));
+        } else {
+          return const Center(child: Text('No documents found.'));
+        }
+      },
     );
   }
 
