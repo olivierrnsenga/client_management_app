@@ -24,6 +24,21 @@ class DocumentRepository {
     }
   }
 
+  Future<List<Document>> fetchDocumentsByProjectId(
+      int projectId, int pageNumber, int pageSize) async {
+    final response = await http.get(
+      Uri.parse(
+          '$baseUrl/Documents/ByProject/$projectId?pageNumber=$pageNumber&pageSize=$pageSize'),
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body)['documents'];
+      return data.map((json) => Document.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load documents for project ID: $projectId');
+    }
+  }
+
   Future<Document> getDocument(int id) async {
     final response = await http.get(Uri.parse('$baseUrl/Documents/$id'));
     if (response.statusCode == 200) {

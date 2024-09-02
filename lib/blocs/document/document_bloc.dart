@@ -7,19 +7,19 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
   final DocumentRepository documentRepository;
 
   DocumentBloc({required this.documentRepository}) : super(DocumentInitial()) {
-    on<FetchDocuments>(_onFetchDocuments);
+    on<FetchDocumentsByProjectId>(_onFetchDocumentsByProjectId);
     on<AddDocument>(_onAddDocument);
     on<UpdateDocument>(_onUpdateDocument);
     on<DeleteDocument>(_onDeleteDocument);
   }
 
-  Future<void> _onFetchDocuments(
-    FetchDocuments event,
+  Future<void> _onFetchDocumentsByProjectId(
+    FetchDocumentsByProjectId event,
     Emitter<DocumentState> emit,
   ) async {
     emit(DocumentLoading());
     try {
-      final documents = await documentRepository.fetchDocuments(
+      final documents = await documentRepository.fetchDocumentsByProjectId(
           event.projectId, event.pageNumber, event.pageSize);
       emit(DocumentLoaded(
         documents: documents,
@@ -40,7 +40,7 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
     try {
       final document = await documentRepository.addDocument(event.document);
       emit(DocumentAdded(document: document));
-      add(FetchDocuments(
+      add(FetchDocumentsByProjectId(
           projectId: document.projectID, pageNumber: 1, pageSize: 10));
     } catch (e) {
       emit(DocumentError(message: e.toString()));
@@ -56,7 +56,7 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
       await documentRepository.updateDocument(
           event.document.documentID!, event.document);
       emit(DocumentUpdated(document: event.document));
-      add(FetchDocuments(
+      add(FetchDocumentsByProjectId(
           projectId: event.document.projectID, pageNumber: 1, pageSize: 10));
     } catch (e) {
       emit(DocumentError(message: e.toString()));
@@ -71,7 +71,7 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
     try {
       await documentRepository.deleteDocument(event.documentID);
       emit(DocumentDeleted(documentID: event.documentID));
-      add(FetchDocuments(
+      add(FetchDocumentsByProjectId(
           projectId: event.documentID, pageNumber: 1, pageSize: 10));
     } catch (e) {
       emit(DocumentError(message: e.toString()));

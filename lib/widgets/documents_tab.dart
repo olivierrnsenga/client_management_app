@@ -163,9 +163,9 @@ class DocumentsTab extends StatelessWidget {
               child: const Text('Delete'),
               onPressed: () {
                 Navigator.of(context).pop();
-                context
-                    .read<DocumentBloc>()
-                    .add(DeleteDocument(documentID: document.documentID!));
+                context.read<DocumentBloc>().add(DeleteDocument(
+                    documentID: document.documentID!,
+                    projectId: document.projectID));
               },
             ),
           ],

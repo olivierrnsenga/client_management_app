@@ -6,15 +6,16 @@ abstract class DocumentEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class FetchDocuments extends DocumentEvent {
+class FetchDocumentsByProjectId extends DocumentEvent {
   final int projectId;
   final int pageNumber;
   final int pageSize;
 
-  FetchDocuments(
-      {required this.projectId,
-      required this.pageNumber,
-      required this.pageSize});
+  FetchDocumentsByProjectId({
+    required this.projectId,
+    required this.pageNumber,
+    required this.pageSize,
+  });
 
   @override
   List<Object?> get props => [projectId, pageNumber, pageSize];
@@ -40,9 +41,10 @@ class UpdateDocument extends DocumentEvent {
 
 class DeleteDocument extends DocumentEvent {
   final int documentID;
+  final int projectId;
 
-  DeleteDocument({required this.documentID});
+  DeleteDocument({required this.documentID, required this.projectId});
 
   @override
-  List<Object?> get props => [documentID];
+  List<Object?> get props => [documentID, projectId];
 }

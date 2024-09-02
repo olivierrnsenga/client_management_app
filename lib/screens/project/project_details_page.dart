@@ -24,7 +24,7 @@ class ProjectDetailsPage extends StatelessWidget {
           final documentRepository =
               RepositoryProvider.of<DocumentRepository>(context);
           return DocumentBloc(documentRepository: documentRepository)
-            ..add(FetchDocuments(
+            ..add(FetchDocumentsByProjectId(
                 projectId: project.projectID!, pageNumber: 1, pageSize: 10));
         },
         child: DefaultTabController(
