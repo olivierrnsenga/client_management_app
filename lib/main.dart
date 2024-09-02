@@ -1,3 +1,4 @@
+import 'package:client_management_app/blocs/document/document_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'blocs/client/client_bloc.dart';
@@ -6,6 +7,7 @@ import 'blocs/user/user_bloc.dart';
 import 'repositories/client_repository.dart';
 import 'repositories/lawyer_repository.dart';
 import 'repositories/user_repository.dart';
+import 'repositories/document_repository.dart';
 import 'screens/home_page.dart';
 import 'screens/login/login_user.dart';
 
@@ -46,6 +48,12 @@ class MyApp extends StatelessWidget {
               return UserRepository(baseUrl: config.baseUrl);
             },
           ),
+          RepositoryProvider<DocumentRepository>(
+            create: (context) {
+              final config = RepositoryProvider.of<AppConfig>(context);
+              return DocumentRepository(baseUrl: config.baseUrl);
+            },
+          ),
         ],
         child: MultiBlocProvider(
           providers: [
@@ -64,6 +72,12 @@ class MyApp extends StatelessWidget {
             BlocProvider<UserBloc>(
               create: (context) => UserBloc(
                 userRepository: RepositoryProvider.of<UserRepository>(context),
+              ),
+            ),
+            BlocProvider<DocumentBloc>(
+              create: (context) => DocumentBloc(
+                documentRepository:
+                    RepositoryProvider.of<DocumentRepository>(context),
               ),
             ),
           ],
