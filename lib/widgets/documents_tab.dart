@@ -5,6 +5,7 @@ import 'package:client_management_app/blocs/document/document_event.dart';
 import 'package:client_management_app/blocs/document/document_state.dart';
 import 'package:client_management_app/models/project/project.dart';
 import 'package:client_management_app/models/document/document.dart';
+import 'package:client_management_app/widgets/pagination_controls.dart';
 
 class DocumentsTab extends StatelessWidget {
   final Project project;
@@ -74,6 +75,17 @@ class DocumentsTab extends StatelessWidget {
                     );
                   },
                 ),
+              ),
+              PaginationControls(
+                currentPage: state.currentPage,
+                totalPages: state.totalPages,
+                totalCount: state.totalCount,
+                onPageChanged: (pageNumber) {
+                  context.read<DocumentBloc>().add(FetchDocumentsByProjectId(
+                      projectId: project.projectID!,
+                      pageNumber: pageNumber,
+                      pageSize: 10));
+                },
               ),
               ElevatedButton.icon(
                 onPressed: () {
