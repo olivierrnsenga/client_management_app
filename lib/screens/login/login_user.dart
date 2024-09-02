@@ -48,6 +48,7 @@ class _LoginPageState extends State<LoginPage> {
         // ignore: unused_local_variable
         final response = await widget.userRepository.loginUser(userLoginDto);
 
+        // ignore: use_build_context_synchronously
         Navigator.pushReplacementNamed(context, '/home');
       } catch (e) {
         setState(() {

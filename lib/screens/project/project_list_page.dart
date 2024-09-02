@@ -4,11 +4,11 @@ import 'package:client_management_app/blocs/project/project_state.dart';
 import 'package:client_management_app/models/project/project.dart';
 import 'package:client_management_app/repositories/project_repository.dart';
 import 'package:client_management_app/screens/project/create_project_page.dart';
+import 'package:client_management_app/screens/project/edit_project_page.dart';
+import 'package:client_management_app/screens/project/project_details_page.dart';
 import 'package:client_management_app/widgets/pagination_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'edit_project_page.dart'; // Import the edit screen
 
 class ProjectListPage extends StatefulWidget {
   const ProjectListPage({super.key});
@@ -93,17 +93,57 @@ class _ProjectListPageState extends State<ProjectListPage> {
                       rows: state.projects.map((project) {
                         return DataRow(
                           cells: [
-                            DataCell(Text(project.projectName)),
-                            DataCell(Text(project.description)),
-                            DataCell(Text(project.startDate.toString())),
-                            DataCell(Text(project.endDate.toString())),
-                            DataCell(Text(project.clientID.toString())),
-                            DataCell(Text(project.lawyerID.toString())),
-                            DataCell(Text(project.statusID.toString())),
+                            DataCell(
+                              GestureDetector(
+                                onTap: () => _showProjectDetails(project),
+                                child: Text(project.projectName),
+                              ),
+                            ),
+                            DataCell(
+                              GestureDetector(
+                                onTap: () => _showProjectDetails(project),
+                                child: Text(project.description),
+                              ),
+                            ),
+                            DataCell(
+                              GestureDetector(
+                                onTap: () => _showProjectDetails(project),
+                                child: Text(project.startDate.toString()),
+                              ),
+                            ),
+                            DataCell(
+                              GestureDetector(
+                                onTap: () => _showProjectDetails(project),
+                                child: Text(project.endDate.toString()),
+                              ),
+                            ),
+                            DataCell(
+                              GestureDetector(
+                                onTap: () => _showProjectDetails(project),
+                                child: Text(project.clientID.toString()),
+                              ),
+                            ),
+                            DataCell(
+                              GestureDetector(
+                                onTap: () => _showProjectDetails(project),
+                                child: Text(project.lawyerID.toString()),
+                              ),
+                            ),
+                            DataCell(
+                              GestureDetector(
+                                onTap: () => _showProjectDetails(project),
+                                child: Text(project.statusID.toString()),
+                              ),
+                            ),
                             DataCell(
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.info_outline),
+                                    onPressed: () =>
+                                        _showProjectDetails(project),
+                                  ),
                                   IconButton(
                                     icon: const Icon(Icons.edit),
                                     onPressed: () => _updateProject(project),
@@ -146,8 +186,7 @@ class _ProjectListPageState extends State<ProjectListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            const CreateProjectPage(), // Removed the 'project' parameter
+        builder: (context) => const CreateProjectPage(),
       ),
     );
   }
@@ -184,6 +223,15 @@ class _ProjectListPageState extends State<ProjectListPage> {
           ],
         );
       },
+    );
+  }
+
+  void _showProjectDetails(Project project) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProjectDetailsPage(project: project),
+      ),
     );
   }
 }
