@@ -2,10 +2,7 @@ class Status {
   final int statusID;
   final String statusName;
 
-  Status({
-    required this.statusID,
-    required this.statusName,
-  });
+  Status({required this.statusID, required this.statusName});
 
   factory Status.fromJson(Map<String, dynamic> json) {
     return Status(

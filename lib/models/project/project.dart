@@ -10,7 +10,7 @@ class Project {
   final DateTime endDate;
   final List<ProjectClient> projectClients;
   final List<ProjectLawyer> projectLawyers;
-  final Status status; // Change from statusID to Status object
+  final Status status;
 
   Project({
     this.projectID,
@@ -20,7 +20,7 @@ class Project {
     required this.endDate,
     required this.projectClients,
     required this.projectLawyers,
-    required this.status, // Expecting a Status object here
+    required this.status,
   });
 
   Project copyWith({
@@ -31,7 +31,7 @@ class Project {
     DateTime? endDate,
     List<ProjectClient>? projectClients,
     List<ProjectLawyer>? projectLawyers,
-    Status? status, // Include Status object in copyWith method
+    Status? status,
   }) {
     return Project(
       projectID: projectID ?? this.projectID,
@@ -41,7 +41,7 @@ class Project {
       endDate: endDate ?? this.endDate,
       projectClients: projectClients ?? this.projectClients,
       projectLawyers: projectLawyers ?? this.projectLawyers,
-      status: status ?? this.status, // Use the Status object
+      status: status ?? this.status,
     );
   }
 
@@ -57,16 +57,21 @@ class Project {
           ? DateTime.parse(json['endDate'])
           : DateTime.now(),
       projectClients: (json['projectClients'] as List<dynamic>?)
-              ?.map((client) => ProjectClient.fromJson(client))
+              ?.map((client) =>
+                  ProjectClient.fromJson(client as Map<String, dynamic>))
               .toList() ??
           [],
       projectLawyers: (json['projectLawyers'] as List<dynamic>?)
-              ?.map((lawyer) => ProjectLawyer.fromJson(lawyer))
+              ?.map((lawyer) =>
+                  ProjectLawyer.fromJson(lawyer as Map<String, dynamic>))
               .toList() ??
           [],
-      status: json['status'] != null
-          ? Status.fromJson(json['status'])
-          : Status(statusID: 0, statusName: 'Unknown'), // Handle null status
+      // Ensure `status` is correctly deserialized as a Map, not a List
+      status: json['status'] is Map<String, dynamic>
+          ? Status.fromJson(json['status'] as Map<String, dynamic>)
+          : Status(
+              statusID: 0,
+              statusName: 'Unknown'), // Handle null or incorrect status
     );
   }
 
@@ -81,7 +86,7 @@ class Project {
           projectClients.map((client) => client.toJson()).toList(),
       'projectLawyers':
           projectLawyers.map((lawyer) => lawyer.toJson()).toList(),
-      'status': status.toJson(), // Serialize Status to JSON
+      'status': status.toJson(),
     };
   }
 }

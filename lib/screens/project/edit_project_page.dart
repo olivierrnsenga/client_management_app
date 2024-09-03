@@ -45,6 +45,7 @@ class _EditProjectPageState extends State<EditProjectPage> {
   @override
   void initState() {
     super.initState();
+    // Initialize the controllers with the current project data
     _projectNameController =
         TextEditingController(text: widget.project.projectName);
     _descriptionController =
@@ -56,6 +57,7 @@ class _EditProjectPageState extends State<EditProjectPage> {
     _clientSearchController = TextEditingController();
     _lawyerSearchController = TextEditingController();
 
+    // Initialize selected clients, lawyers, and status
     _selectedProjectClients.addAll(widget.project.projectClients);
     _selectedProjectLawyers.addAll(widget.project.projectLawyers);
     _selectedStatus = widget.project.status;
@@ -66,6 +68,7 @@ class _EditProjectPageState extends State<EditProjectPage> {
 
   @override
   void dispose() {
+    // Dispose of all controllers
     _projectNameController.dispose();
     _descriptionController.dispose();
     _startDateController.dispose();
@@ -84,11 +87,23 @@ class _EditProjectPageState extends State<EditProjectPage> {
         endDate: DateTime.parse(_endDateController.text),
         projectClients: _selectedProjectClients,
         projectLawyers: _selectedProjectLawyers,
-        status: _selectedStatus!, // Use the selected Status object
+        status: _selectedStatus!, // Ensure that a status is selected
       );
       context.read<ProjectBloc>().add(UpdateProject(project: updatedProject));
       Navigator.pop(context);
     }
+  }
+
+  Status _getExactStatusMatch(Status? selectedStatus, List<Status> statuses) {
+    if (selectedStatus == null || statuses.isEmpty) {
+      return statuses.first; // Provide a default Status when no match is found
+    }
+
+    return statuses.firstWhere(
+      (status) => status.statusID == selectedStatus.statusID,
+      orElse: () =>
+          statuses.first, // Return the first status if no match is found
+    );
   }
 
   Future<void> _selectDate(
@@ -284,6 +299,10 @@ class _EditProjectPageState extends State<EditProjectPage> {
                   if (state is StatusLoading) {
                     return const CircularProgressIndicator();
                   } else if (state is StatusLoaded) {
+                    // Match selected status with exact instance from list
+                    _selectedStatus =
+                        _getExactStatusMatch(_selectedStatus, state.statuses);
+
                     return DropdownButtonFormField<Status>(
                       value: _selectedStatus,
                       decoration: const InputDecoration(labelText: 'Status'),
@@ -307,7 +326,7 @@ class _EditProjectPageState extends State<EditProjectPage> {
                     return const SizedBox();
                   }
                 },
-              ),
+              )
             ],
           ),
         ),
