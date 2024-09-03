@@ -21,8 +21,8 @@ class ProjectDetailsTab extends StatelessWidget {
               'End Date', project.endDate.toString(), Icons.calendar_today),
           _buildClientsDetailCard(),
           _buildLawyersDetailCard(),
-          _buildDetailCard(
-              'Status ID', project.statusID.toString(), Icons.info),
+          _buildDetailCard('Status', project.status.statusName,
+              Icons.info), // Updated from Status ID to Status Name
         ],
       ),
     );

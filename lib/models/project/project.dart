@@ -1,3 +1,4 @@
+import 'package:client_management_app/models/status/status.dart';
 import 'package:client_management_app/models/project/project_client.dart';
 import 'package:client_management_app/models/project/project_lawyer.dart';
 
@@ -9,7 +10,7 @@ class Project {
   final DateTime endDate;
   final List<ProjectClient> projectClients;
   final List<ProjectLawyer> projectLawyers;
-  final int statusID;
+  final Status status; // Change from statusID to Status object
 
   Project({
     this.projectID,
@@ -19,8 +20,9 @@ class Project {
     required this.endDate,
     required this.projectClients,
     required this.projectLawyers,
-    required this.statusID,
+    required this.status, // Expecting a Status object here
   });
+
   Project copyWith({
     int? projectID,
     String? projectName,
@@ -29,7 +31,7 @@ class Project {
     DateTime? endDate,
     List<ProjectClient>? projectClients,
     List<ProjectLawyer>? projectLawyers,
-    int? statusID,
+    Status? status, // Include Status object in copyWith method
   }) {
     return Project(
       projectID: projectID ?? this.projectID,
@@ -39,7 +41,7 @@ class Project {
       endDate: endDate ?? this.endDate,
       projectClients: projectClients ?? this.projectClients,
       projectLawyers: projectLawyers ?? this.projectLawyers,
-      statusID: statusID ?? this.statusID,
+      status: status ?? this.status, // Use the Status object
     );
   }
 
@@ -62,7 +64,9 @@ class Project {
               ?.map((lawyer) => ProjectLawyer.fromJson(lawyer))
               .toList() ??
           [],
-      statusID: json['statusID'] as int? ?? 0,
+      status: json['status'] != null
+          ? Status.fromJson(json['status'])
+          : Status(statusID: 0, statusName: 'Unknown'), // Handle null status
     );
   }
 
@@ -77,7 +81,7 @@ class Project {
           projectClients.map((client) => client.toJson()).toList(),
       'projectLawyers':
           projectLawyers.map((lawyer) => lawyer.toJson()).toList(),
-      'statusID': statusID,
+      'status': status.toJson(), // Serialize Status to JSON
     };
   }
 }

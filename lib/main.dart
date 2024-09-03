@@ -1,6 +1,8 @@
 import 'package:client_management_app/blocs/document/document_bloc.dart';
 import 'package:client_management_app/blocs/project/project_bloc.dart';
+import 'package:client_management_app/blocs/status/status_bloc.dart';
 import 'package:client_management_app/repositories/project_repository.dart';
+import 'package:client_management_app/repositories/status_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'blocs/client/client_bloc.dart';
@@ -56,7 +58,14 @@ class MyApp extends StatelessWidget {
               return DocumentRepository(baseUrl: config.baseUrl);
             },
           ),
+          RepositoryProvider<StatusRepository>(
+            create: (context) {
+              final config = RepositoryProvider.of<AppConfig>(context);
+              return StatusRepository(baseUrl: config.baseUrl);
+            },
+          ),
           RepositoryProvider<ProjectRepository>(
+            // Added ProjectRepository here
             create: (context) {
               final config = RepositoryProvider.of<AppConfig>(context);
               return ProjectRepository(baseUrl: config.baseUrl);
@@ -89,10 +98,15 @@ class MyApp extends StatelessWidget {
               ),
             ),
             BlocProvider<ProjectBloc>(
-              // Add ProjectBloc here
               create: (context) => ProjectBloc(
                 projectRepository:
                     RepositoryProvider.of<ProjectRepository>(context),
+              ),
+            ),
+            BlocProvider<StatusBloc>(
+              create: (context) => StatusBloc(
+                statusRepository:
+                    RepositoryProvider.of<StatusRepository>(context),
               ),
             ),
           ],
@@ -101,7 +115,7 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
               primarySwatch: Colors.blue,
             ),
-            home: const LoginPageWrapper(), // Wrapped LoginPage
+            home: const LoginPageWrapper(),
             routes: {
               '/home': (context) => const HomePage(),
             },

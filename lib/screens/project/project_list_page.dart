@@ -86,7 +86,7 @@ class _ProjectListPageState extends State<ProjectListPage> {
                         DataColumn(label: Text('End Date')),
                         DataColumn(label: Text('Clients')),
                         DataColumn(label: Text('Lawyers')),
-                        DataColumn(label: Text('Status ID')),
+                        DataColumn(label: Text('Status')),
                         DataColumn(label: Text('Actions')),
                       ],
                       rows: state.projects.map((project) {
@@ -163,7 +163,8 @@ class _ProjectListPageState extends State<ProjectListPage> {
                             DataCell(
                               GestureDetector(
                                 onTap: () => _showProjectDetails(project),
-                                child: Text(project.statusID.toString()),
+                                child: Text(project.status
+                                    .statusName), // Updated to display status name
                               ),
                             ),
                             DataCell(

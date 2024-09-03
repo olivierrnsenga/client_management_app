@@ -1,8 +1,4 @@
-import 'package:client_management_app/blocs/project/project_bloc.dart';
-import 'package:client_management_app/blocs/project/project_event.dart';
-import 'package:client_management_app/models/client/client.dart';
-import 'package:client_management_app/models/lawyer/lawyer.dart';
-import 'package:client_management_app/models/project/project.dart';
+import 'package:client_management_app/models/status/status.dart';
 import 'package:client_management_app/models/project/project_client.dart';
 import 'package:client_management_app/models/project/project_lawyer.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +9,14 @@ import 'package:client_management_app/blocs/client/client_state.dart';
 import 'package:client_management_app/blocs/lawyer/lawyer_bloc.dart';
 import 'package:client_management_app/blocs/lawyer/lawyer_event.dart';
 import 'package:client_management_app/blocs/lawyer/lawyer_state.dart';
+import 'package:client_management_app/blocs/project/project_bloc.dart';
+import 'package:client_management_app/blocs/project/project_event.dart';
+import 'package:client_management_app/blocs/status/status_bloc.dart';
+import 'package:client_management_app/blocs/status/status_event.dart';
+import 'package:client_management_app/blocs/status/status_state.dart';
+import 'package:client_management_app/models/client/client.dart';
+import 'package:client_management_app/models/lawyer/lawyer.dart';
+import 'package:client_management_app/models/project/project.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class EditProjectPage extends StatefulWidget {
@@ -31,12 +35,12 @@ class _EditProjectPageState extends State<EditProjectPage> {
   late TextEditingController _descriptionController;
   late TextEditingController _startDateController;
   late TextEditingController _endDateController;
-  late TextEditingController _statusIDController;
   late TextEditingController _clientSearchController;
   late TextEditingController _lawyerSearchController;
 
   final List<ProjectClient> _selectedProjectClients = [];
   final List<ProjectLawyer> _selectedProjectLawyers = [];
+  Status? _selectedStatus;
 
   @override
   void initState() {
@@ -49,14 +53,15 @@ class _EditProjectPageState extends State<EditProjectPage> {
         TextEditingController(text: widget.project.startDate.toIso8601String());
     _endDateController =
         TextEditingController(text: widget.project.endDate.toIso8601String());
-    _statusIDController =
-        TextEditingController(text: widget.project.statusID.toString());
     _clientSearchController = TextEditingController();
     _lawyerSearchController = TextEditingController();
 
-    // Initialize with existing projectClients and projectLawyers
     _selectedProjectClients.addAll(widget.project.projectClients);
     _selectedProjectLawyers.addAll(widget.project.projectLawyers);
+    _selectedStatus = widget.project.status;
+
+    // Fetch statuses when the page is initialized
+    context.read<StatusBloc>().add(FetchStatuses());
   }
 
   @override
@@ -65,7 +70,6 @@ class _EditProjectPageState extends State<EditProjectPage> {
     _descriptionController.dispose();
     _startDateController.dispose();
     _endDateController.dispose();
-    _statusIDController.dispose();
     _clientSearchController.dispose();
     _lawyerSearchController.dispose();
     super.dispose();
@@ -80,7 +84,7 @@ class _EditProjectPageState extends State<EditProjectPage> {
         endDate: DateTime.parse(_endDateController.text),
         projectClients: _selectedProjectClients,
         projectLawyers: _selectedProjectLawyers,
-        statusID: int.parse(_statusIDController.text),
+        status: _selectedStatus!, // Use the selected Status object
       );
       context.read<ProjectBloc>().add(UpdateProject(project: updatedProject));
       Navigator.pop(context);
@@ -165,7 +169,7 @@ class _EditProjectPageState extends State<EditProjectPage> {
                       child: Icon(Icons.person),
                     ),
                     label: Text(
-                        ' ${projectClient.client.firstName} ${projectClient.client.lastName}'),
+                        '${projectClient.client.firstName} ${projectClient.client.lastName}'),
                     onDeleted: () {
                       setState(() {
                         _selectedProjectClients.remove(projectClient);
@@ -275,11 +279,34 @@ class _EditProjectPageState extends State<EditProjectPage> {
                     const Text('No lawyers found'),
               ),
               const SizedBox(height: 16.0),
-              TextFormField(
-                controller: _statusIDController,
-                decoration: const InputDecoration(labelText: 'Status ID'),
-                validator: (value) =>
-                    value?.isEmpty ?? true ? 'Please enter status ID' : null,
+              BlocBuilder<StatusBloc, StatusState>(
+                builder: (context, state) {
+                  if (state is StatusLoading) {
+                    return const CircularProgressIndicator();
+                  } else if (state is StatusLoaded) {
+                    return DropdownButtonFormField<Status>(
+                      value: _selectedStatus,
+                      decoration: const InputDecoration(labelText: 'Status'),
+                      items: state.statuses.map((status) {
+                        return DropdownMenuItem<Status>(
+                          value: status,
+                          child: Text(status.statusName),
+                        );
+                      }).toList(),
+                      onChanged: (Status? newValue) {
+                        setState(() {
+                          _selectedStatus = newValue!;
+                        });
+                      },
+                      validator: (value) =>
+                          value == null ? 'Please select a status' : null,
+                    );
+                  } else if (state is StatusError) {
+                    return Text('Error: ${state.message}');
+                  } else {
+                    return const SizedBox();
+                  }
+                },
               ),
             ],
           ),

@@ -1,3 +1,4 @@
+import 'package:client_management_app/models/status/status.dart';
 import 'package:client_management_app/models/project/project_client.dart';
 import 'package:client_management_app/models/project/project_lawyer.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,9 @@ import 'package:client_management_app/blocs/lawyer/lawyer_event.dart';
 import 'package:client_management_app/blocs/lawyer/lawyer_state.dart';
 import 'package:client_management_app/blocs/project/project_bloc.dart';
 import 'package:client_management_app/blocs/project/project_event.dart';
+import 'package:client_management_app/blocs/status/status_bloc.dart';
+import 'package:client_management_app/blocs/status/status_event.dart';
+import 'package:client_management_app/blocs/status/status_state.dart';
 import 'package:client_management_app/models/client/client.dart';
 import 'package:client_management_app/models/lawyer/lawyer.dart';
 import 'package:client_management_app/models/project/project.dart';
@@ -31,6 +35,7 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
   late TextEditingController _endDateController;
   late TextEditingController _clientSearchController;
   late TextEditingController _lawyerSearchController;
+  Status? _selectedStatus;
   final List<Client> _selectedClients = [];
   final List<Lawyer> _selectedLawyers = [];
 
@@ -43,6 +48,9 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
     _endDateController = TextEditingController();
     _clientSearchController = TextEditingController();
     _lawyerSearchController = TextEditingController();
+
+    // Fetch statuses when the page is initialized
+    context.read<StatusBloc>().add(FetchStatuses());
   }
 
   @override
@@ -79,7 +87,9 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                   lawyer: lawyer,
                 ))
             .toList(),
-        statusID: 1, // Example status ID, adjust as needed
+        status: _selectedStatus ??
+            Status(
+                statusID: 1, statusName: 'Pending'), // Pass Status object here
       );
       context.read<ProjectBloc>().add(AddProject(project: newProject));
       Navigator.pop(context);
@@ -254,11 +264,34 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                     const Text('No lawyers found'),
               ),
               const SizedBox(height: 16.0),
-              TextFormField(
-                controller: _startDateController,
-                decoration: const InputDecoration(labelText: 'Status ID'),
-                validator: (value) =>
-                    value?.isEmpty ?? true ? 'Please enter status ID' : null,
+              BlocBuilder<StatusBloc, StatusState>(
+                builder: (context, state) {
+                  if (state is StatusLoading) {
+                    return const CircularProgressIndicator();
+                  } else if (state is StatusLoaded) {
+                    return DropdownButtonFormField<Status>(
+                      value: _selectedStatus,
+                      decoration: const InputDecoration(labelText: 'Status'),
+                      items: state.statuses.map((status) {
+                        return DropdownMenuItem<Status>(
+                          value: status,
+                          child: Text(status.statusName),
+                        );
+                      }).toList(),
+                      onChanged: (Status? newValue) {
+                        setState(() {
+                          _selectedStatus = newValue!;
+                        });
+                      },
+                      validator: (value) =>
+                          value == null ? 'Please select a status' : null,
+                    );
+                  } else if (state is StatusError) {
+                    return Text('Error: ${state.message}');
+                  } else {
+                    return const SizedBox();
+                  }
+                },
               ),
             ],
           ),
