@@ -84,8 +84,8 @@ class _ProjectListPageState extends State<ProjectListPage> {
                         DataColumn(label: Text('Description')),
                         DataColumn(label: Text('Start Date')),
                         DataColumn(label: Text('End Date')),
-                        DataColumn(label: Text('Client IDs')),
-                        DataColumn(label: Text('Lawyer IDs')),
+                        DataColumn(label: Text('Clients')),
+                        DataColumn(label: Text('Lawyers')),
                         DataColumn(label: Text('Status ID')),
                         DataColumn(label: Text('Actions')),
                       ],
@@ -119,13 +119,23 @@ class _ProjectListPageState extends State<ProjectListPage> {
                             DataCell(
                               GestureDetector(
                                 onTap: () => _showProjectDetails(project),
-                                child: Text(project.clientIDs.join(', ')),
+                                child: Text(
+                                  project.projectClients
+                                      .map((pc) =>
+                                          '${pc.client.firstName} ${pc.client.lastName}')
+                                      .join(', '),
+                                ),
                               ),
                             ),
                             DataCell(
                               GestureDetector(
                                 onTap: () => _showProjectDetails(project),
-                                child: Text(project.lawyerIDs.join(', ')),
+                                child: Text(
+                                  project.projectLawyers
+                                      .map((pl) =>
+                                          '${pl.lawyer.firstName} ${pl.lawyer.lastName}')
+                                      .join(', '),
+                                ),
                               ),
                             ),
                             DataCell(

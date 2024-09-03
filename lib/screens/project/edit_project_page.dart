@@ -1,6 +1,8 @@
 import 'package:client_management_app/blocs/project/project_bloc.dart';
 import 'package:client_management_app/blocs/project/project_event.dart';
 import 'package:client_management_app/models/project/project.dart';
+import 'package:client_management_app/models/project/project_client.dart';
+import 'package:client_management_app/models/project/project_lawyer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -22,8 +24,8 @@ class _EditProjectPageState extends State<EditProjectPage> {
   late TextEditingController _endDateController;
   late TextEditingController _statusIDController;
 
-  final List<int> _selectedClientIDs = [];
-  final List<int> _selectedLawyerIDs = [];
+  final List<ProjectClient> _selectedProjectClients = [];
+  final List<ProjectLawyer> _selectedProjectLawyers = [];
 
   @override
   void initState() {
@@ -39,9 +41,9 @@ class _EditProjectPageState extends State<EditProjectPage> {
     _statusIDController =
         TextEditingController(text: widget.project.statusID.toString());
 
-    // Initialize with existing clientIDs and lawyerIDs
-    _selectedClientIDs.addAll(widget.project.clientIDs);
-    _selectedLawyerIDs.addAll(widget.project.lawyerIDs);
+    // Initialize with existing projectClients and projectLawyers
+    _selectedProjectClients.addAll(widget.project.projectClients);
+    _selectedProjectLawyers.addAll(widget.project.projectLawyers);
   }
 
   @override
@@ -61,8 +63,8 @@ class _EditProjectPageState extends State<EditProjectPage> {
         description: _descriptionController.text,
         startDate: DateTime.parse(_startDateController.text),
         endDate: DateTime.parse(_endDateController.text),
-        clientIDs: _selectedClientIDs, // Use list of client IDs
-        lawyerIDs: _selectedLawyerIDs, // Use list of lawyer IDs
+        projectClients: _selectedProjectClients,
+        projectLawyers: _selectedProjectLawyers,
         statusID: int.parse(_statusIDController.text),
       );
       context.read<ProjectBloc>().add(UpdateProject(project: updatedProject));
@@ -142,13 +144,13 @@ class _EditProjectPageState extends State<EditProjectPage> {
               const SizedBox(height: 16.0),
               Wrap(
                 spacing: 8.0,
-                children: _selectedClientIDs.map((clientID) {
+                children: _selectedProjectClients.map((projectClient) {
                   return Chip(
                     label: Text(
-                        'Client $clientID'), // You can enhance this to show client names
+                        'Client ${projectClient.client.firstName} ${projectClient.client.lastName}'),
                     onDeleted: () {
                       setState(() {
-                        _selectedClientIDs.remove(clientID);
+                        _selectedProjectClients.remove(projectClient);
                       });
                     },
                   );
@@ -159,13 +161,13 @@ class _EditProjectPageState extends State<EditProjectPage> {
               const SizedBox(height: 16.0),
               Wrap(
                 spacing: 8.0,
-                children: _selectedLawyerIDs.map((lawyerID) {
+                children: _selectedProjectLawyers.map((projectLawyer) {
                   return Chip(
                     label: Text(
-                        'Lawyer $lawyerID'), // You can enhance this to show lawyer names
+                        'Lawyer ${projectLawyer.lawyer.firstName} ${projectLawyer.lawyer.lastName}'),
                     onDeleted: () {
                       setState(() {
-                        _selectedLawyerIDs.remove(lawyerID);
+                        _selectedProjectLawyers.remove(projectLawyer);
                       });
                     },
                   );

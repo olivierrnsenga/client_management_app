@@ -1,11 +1,14 @@
+import 'package:client_management_app/models/project/project_client.dart';
+import 'package:client_management_app/models/project/project_lawyer.dart';
+
 class Project {
   final int? projectID;
   final String projectName;
   final String description;
   final DateTime startDate;
   final DateTime endDate;
-  final List<int> clientIDs; // List of client IDs
-  final List<int> lawyerIDs; // List of lawyer IDs
+  final List<ProjectClient> projectClients;
+  final List<ProjectLawyer> projectLawyers;
   final int statusID;
 
   Project({
@@ -14,10 +17,31 @@ class Project {
     required this.description,
     required this.startDate,
     required this.endDate,
-    required this.clientIDs, // Updated to accept a list of IDs
-    required this.lawyerIDs, // Updated to accept a list of IDs
+    required this.projectClients,
+    required this.projectLawyers,
     required this.statusID,
   });
+  Project copyWith({
+    int? projectID,
+    String? projectName,
+    String? description,
+    DateTime? startDate,
+    DateTime? endDate,
+    List<ProjectClient>? projectClients,
+    List<ProjectLawyer>? projectLawyers,
+    int? statusID,
+  }) {
+    return Project(
+      projectID: projectID ?? this.projectID,
+      projectName: projectName ?? this.projectName,
+      description: description ?? this.description,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      projectClients: projectClients ?? this.projectClients,
+      projectLawyers: projectLawyers ?? this.projectLawyers,
+      statusID: statusID ?? this.statusID,
+    );
+  }
 
   factory Project.fromJson(Map<String, dynamic> json) {
     return Project(
@@ -30,44 +54,30 @@ class Project {
       endDate: json['endDate'] != null
           ? DateTime.parse(json['endDate'])
           : DateTime.now(),
-      clientIDs: List<int>.from(json['clientIDs'] ?? []), // Parse list of IDs
-      lawyerIDs: List<int>.from(json['lawyerIDs'] ?? []), // Parse list of IDs
+      projectClients: (json['projectClients'] as List<dynamic>?)
+              ?.map((client) => ProjectClient.fromJson(client))
+              .toList() ??
+          [],
+      projectLawyers: (json['projectLawyers'] as List<dynamic>?)
+              ?.map((lawyer) => ProjectLawyer.fromJson(lawyer))
+              .toList() ??
+          [],
       statusID: json['statusID'] as int? ?? 0,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'projectID': projectID ?? 0, // Provide a default value if null
+      'projectID': projectID ?? 0,
       'projectName': projectName,
       'description': description,
       'startDate': startDate.toIso8601String(),
       'endDate': endDate.toIso8601String(),
-      'clientIDs': clientIDs, // Convert list of client IDs to JSON
-      'lawyerIDs': lawyerIDs, // Convert list of lawyer IDs to JSON
+      'projectClients':
+          projectClients.map((client) => client.toJson()).toList(),
+      'projectLawyers':
+          projectLawyers.map((lawyer) => lawyer.toJson()).toList(),
       'statusID': statusID,
     };
-  }
-
-  Project copyWith({
-    int? projectID,
-    String? projectName,
-    String? description,
-    DateTime? startDate,
-    DateTime? endDate,
-    List<int>? clientIDs, // Updated to accept a list of IDs
-    List<int>? lawyerIDs, // Updated to accept a list of IDs
-    int? statusID,
-  }) {
-    return Project(
-      projectID: projectID ?? this.projectID,
-      projectName: projectName ?? this.projectName,
-      description: description ?? this.description,
-      startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
-      clientIDs: clientIDs ?? this.clientIDs, // Use new or existing list
-      lawyerIDs: lawyerIDs ?? this.lawyerIDs, // Use new or existing list
-      statusID: statusID ?? this.statusID,
-    );
   }
 }

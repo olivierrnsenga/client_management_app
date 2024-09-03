@@ -1,3 +1,5 @@
+import 'package:client_management_app/models/project/project_client.dart';
+import 'package:client_management_app/models/project/project_lawyer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client_management_app/blocs/client/client_bloc.dart';
@@ -61,8 +63,22 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
         description: _descriptionController.text,
         startDate: DateTime.parse(_startDateController.text),
         endDate: DateTime.parse(_endDateController.text),
-        clientIDs: _selectedClients.map((client) => client.clientID).toList(),
-        lawyerIDs: _selectedLawyers.map((lawyer) => lawyer.lawyerID).toList(),
+        projectClients: _selectedClients
+            .map((client) => ProjectClient(
+                  projectID:
+                      0, // Use 0 or a temporary ID if creating a new project
+                  clientID: client.clientID,
+                  client: client,
+                ))
+            .toList(),
+        projectLawyers: _selectedLawyers
+            .map((lawyer) => ProjectLawyer(
+                  projectID:
+                      0, // Use 0 or a temporary ID if creating a new project
+                  lawyerID: lawyer.lawyerID,
+                  lawyer: lawyer,
+                ))
+            .toList(),
         statusID: 1, // Example status ID, adjust as needed
       );
       context.read<ProjectBloc>().add(AddProject(project: newProject));

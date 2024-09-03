@@ -19,10 +19,8 @@ class ProjectDetailsTab extends StatelessWidget {
               'Start Date', project.startDate.toString(), Icons.calendar_today),
           _buildDetailCard(
               'End Date', project.endDate.toString(), Icons.calendar_today),
-          _buildDetailCard(
-              'Client IDs', project.clientIDs.join(', '), Icons.person),
-          _buildDetailCard(
-              'Lawyer IDs', project.lawyerIDs.join(', '), Icons.person_outline),
+          _buildClientsDetailCard(),
+          _buildLawyersDetailCard(),
           _buildDetailCard(
               'Status ID', project.statusID.toString(), Icons.info),
         ],
@@ -67,6 +65,26 @@ class ProjectDetailsTab extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildClientsDetailCard() {
+    return _buildDetailCard(
+      'Clients',
+      project.projectClients
+          .map((pc) => '${pc.client.firstName} ${pc.client.lastName}')
+          .join(', '),
+      Icons.person,
+    );
+  }
+
+  Widget _buildLawyersDetailCard() {
+    return _buildDetailCard(
+      'Lawyers',
+      project.projectLawyers
+          .map((pl) => '${pl.lawyer.firstName} ${pl.lawyer.lastName}')
+          .join(', '),
+      Icons.person_outline,
     );
   }
 }

@@ -44,7 +44,7 @@ class ProjectDetailsPage extends StatelessWidget {
             body: TabBarView(
               children: [
                 _buildProjectDetailsTab(),
-                DocumentsTab(project: project), // Pass the project here
+                DocumentsTab(project: project),
                 _buildCorrespondenceTab(),
                 _buildStakeholdersTab(),
               ],
@@ -132,7 +132,7 @@ class ProjectDetailsPage extends StatelessWidget {
             const SizedBox(width: 10),
             const Expanded(
               child: Text(
-                'Client IDs',
+                'Clients',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
@@ -144,9 +144,9 @@ class ProjectDetailsPage extends StatelessWidget {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
-                children: project.clientIDs
-                    .map((id) => Text(
-                          'Client ID: $id',
+                children: project.projectClients
+                    .map((projectClient) => Text(
+                          '${projectClient.client.firstName} ${projectClient.client.lastName}',
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.black54,
@@ -177,7 +177,7 @@ class ProjectDetailsPage extends StatelessWidget {
             const SizedBox(width: 10),
             const Expanded(
               child: Text(
-                'Lawyer IDs',
+                'Lawyers',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
@@ -189,9 +189,9 @@ class ProjectDetailsPage extends StatelessWidget {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
-                children: project.lawyerIDs
-                    .map((id) => Text(
-                          'Lawyer ID: $id',
+                children: project.projectLawyers
+                    .map((projectLawyer) => Text(
+                          '${projectLawyer.lawyer.firstName} ${projectLawyer.lawyer.lastName}',
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.black54,
