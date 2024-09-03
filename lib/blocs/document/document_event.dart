@@ -1,7 +1,9 @@
-import 'package:equatable/equatable.dart';
 import 'package:client_management_app/models/document/document.dart';
+import 'package:equatable/equatable.dart';
 
 abstract class DocumentEvent extends Equatable {
+  const DocumentEvent();
+
   @override
   List<Object?> get props => [];
 }
@@ -11,7 +13,7 @@ class FetchDocumentsByProjectId extends DocumentEvent {
   final int pageNumber;
   final int pageSize;
 
-  FetchDocumentsByProjectId({
+  const FetchDocumentsByProjectId({
     required this.projectId,
     required this.pageNumber,
     required this.pageSize,
@@ -21,29 +23,32 @@ class FetchDocumentsByProjectId extends DocumentEvent {
   List<Object?> get props => [projectId, pageNumber, pageSize];
 }
 
-class AddDocument extends DocumentEvent {
-  final Document document;
+class AddDocuments extends DocumentEvent {
+  final List<Document> documents; // Handle multiple documents
 
-  AddDocument({required this.document});
+  const AddDocuments({required this.documents});
 
   @override
-  List<Object?> get props => [document];
+  List<Object?> get props => [documents];
 }
 
-class UpdateDocument extends DocumentEvent {
-  final Document document;
+class UpdateDocuments extends DocumentEvent {
+  final List<Document> documents; // Handle multiple documents
 
-  UpdateDocument({required this.document});
+  const UpdateDocuments({required this.documents});
 
   @override
-  List<Object?> get props => [document];
+  List<Object?> get props => [documents];
 }
 
 class DeleteDocument extends DocumentEvent {
   final int documentID;
   final int projectId;
 
-  DeleteDocument({required this.documentID, required this.projectId});
+  const DeleteDocument({
+    required this.documentID,
+    required this.projectId,
+  });
 
   @override
   List<Object?> get props => [documentID, projectId];

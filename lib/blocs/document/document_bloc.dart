@@ -8,8 +8,9 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
 
   DocumentBloc({required this.documentRepository}) : super(DocumentInitial()) {
     on<FetchDocumentsByProjectId>(_onFetchDocumentsByProjectId);
-    on<AddDocument>(_onAddDocument);
-    on<UpdateDocument>(_onUpdateDocument);
+    on<AddDocuments>(_onAddDocuments); // Updated to handle multiple documents
+    on<UpdateDocuments>(
+        _onUpdateDocuments); // Updated to handle multiple documents
     on<DeleteDocument>(_onDeleteDocument);
   }
 
@@ -32,32 +33,40 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
     }
   }
 
-  Future<void> _onAddDocument(
-    AddDocument event,
+  Future<void> _onAddDocuments(
+    AddDocuments event, // Accepting multiple documents
     Emitter<DocumentState> emit,
   ) async {
     emit(DocumentLoading());
     try {
-      final document = await documentRepository.addDocument(event.document);
-      emit(DocumentAdded(document: document));
+      final documents = await documentRepository
+          .addDocuments(event.documents); // Handle multiple documents
+      emit(DocumentsAdded(
+          documents: documents)); // Emitting a state with the added documents
       add(FetchDocumentsByProjectId(
-          projectId: document.projectID, pageNumber: 1, pageSize: 10));
+          projectId: documents.first.projectID,
+          pageNumber: 1,
+          pageSize: 10)); // Fetch documents after adding
     } catch (e) {
       emit(DocumentError(message: e.toString()));
     }
   }
 
-  Future<void> _onUpdateDocument(
-    UpdateDocument event,
+  Future<void> _onUpdateDocuments(
+    UpdateDocuments event, // Accepting multiple documents
     Emitter<DocumentState> emit,
   ) async {
     emit(DocumentLoading());
     try {
-      await documentRepository.updateDocument(
-          event.document.documentID!, event.document);
-      emit(DocumentUpdated(document: event.document));
+      await documentRepository
+          .updateDocuments(event.documents); // Handle multiple documents
+      emit(DocumentsUpdated(
+          documents:
+              event.documents)); // Emitting a state with the updated documents
       add(FetchDocumentsByProjectId(
-          projectId: event.document.projectID, pageNumber: 1, pageSize: 10));
+          projectId: event.documents.first.projectID,
+          pageNumber: 1,
+          pageSize: 10)); // Fetch documents after updating
     } catch (e) {
       emit(DocumentError(message: e.toString()));
     }
@@ -72,7 +81,9 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
       await documentRepository.deleteDocument(event.documentID);
       emit(DocumentDeleted(documentID: event.documentID));
       add(FetchDocumentsByProjectId(
-          projectId: event.documentID, pageNumber: 1, pageSize: 10));
+          projectId: event.projectId,
+          pageNumber: 1,
+          pageSize: 10)); // Fetch documents after deleting
     } catch (e) {
       emit(DocumentError(message: e.toString()));
     }

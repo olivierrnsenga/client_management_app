@@ -144,9 +144,8 @@ class DocumentsTab extends StatelessWidget {
         return DocumentDialog(
           project: project,
           onSave: (documents) {
-            for (var document in documents) {
-              context.read<DocumentBloc>().add(AddDocument(document: document));
-            }
+            context.read<DocumentBloc>().add(AddDocuments(
+                documents: documents)); // Updated to use AddDocuments
           },
         );
       },
@@ -161,11 +160,8 @@ class DocumentsTab extends StatelessWidget {
           project: project,
           document: document,
           onSave: (updatedDocuments) {
-            for (var document in updatedDocuments) {
-              context
-                  .read<DocumentBloc>()
-                  .add(UpdateDocument(document: document));
-            }
+            context.read<DocumentBloc>().add(UpdateDocuments(
+                documents: updatedDocuments)); // Updated to use UpdateDocuments
           },
         );
       },
@@ -286,12 +282,12 @@ class _DocumentDialogState extends State<DocumentDialog> {
             if (_selectedFiles.isNotEmpty) {
               List<Document> documents = _selectedFiles.map((file) {
                 return Document(
+                  documentID: 0,
                   projectID: widget.project.projectID!,
                   documentName: file.name,
                   documentType: file.extension ?? '',
                   documentPath: file.path ?? '',
                   uploadDate: DateTime.now(),
-                  documentID: widget.document?.documentID,
                 );
               }).toList();
 

@@ -7,8 +7,7 @@ class DocumentRepository {
 
   DocumentRepository({required this.baseUrl});
 
-  Future<List<Document>> fetchDocuments(
-      int projectId, int pageNumber, int pageSize) async {
+  Future<List<Document>> fetchDocuments(int pageNumber, int pageSize) async {
     final response = await http.get(
       Uri.parse('$baseUrl/Documents?pageNumber=$pageNumber&pageSize=$pageSize'),
     );
@@ -42,33 +41,39 @@ class DocumentRepository {
   Future<Document> getDocument(int id) async {
     final response = await http.get(Uri.parse('$baseUrl/Documents/$id'));
     if (response.statusCode == 200) {
-      return Document.fromJson(json.decode(response.body)['Document']);
+      return Document.fromJson(
+          json.decode(response.body)['document']); // Use lowercase key
     } else {
       throw Exception('Failed to load document');
     }
   }
 
-  Future<Document> addDocument(Document document) async {
+  Future<List<Document>> addDocuments(List<Document> documents) async {
     final response = await http.post(
       Uri.parse('$baseUrl/Documents'),
       headers: {'Content-Type': 'application/json'},
-      body: json.encode(document.toJson()),
+      body: json.encode(
+          documents.map((doc) => doc.toJson()).toList()), // Send as an array
     );
     if (response.statusCode == 201) {
-      return Document.fromJson(json.decode(response.body)['Document']);
+      final List<dynamic> data = json.decode(response.body)['documents'];
+      return data.map((json) => Document.fromJson(json)).toList();
     } else {
-      throw Exception('Failed to add document');
+      throw Exception('Failed to add documents');
     }
   }
 
-  Future<void> updateDocument(int id, Document document) async {
-    final response = await http.put(
-      Uri.parse('$baseUrl/Documents/$id'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(document.toJson()),
-    );
-    if (response.statusCode != 204) {
-      throw Exception('Failed to update document');
+  Future<void> updateDocuments(List<Document> documents) async {
+    for (var document in documents) {
+      final response = await http.put(
+        Uri.parse('$baseUrl/Documents/${document.documentID}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(document.toJson()),
+      );
+      if (response.statusCode != 204) {
+        throw Exception(
+            'Failed to update document with ID ${document.documentID}');
+      }
     }
   }
 

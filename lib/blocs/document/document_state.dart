@@ -1,7 +1,9 @@
-import 'package:equatable/equatable.dart';
 import 'package:client_management_app/models/document/document.dart';
+import 'package:equatable/equatable.dart';
 
 abstract class DocumentState extends Equatable {
+  const DocumentState();
+
   @override
   List<Object?> get props => [];
 }
@@ -16,7 +18,7 @@ class DocumentLoaded extends DocumentState {
   final int currentPage;
   final int totalPages;
 
-  DocumentLoaded({
+  const DocumentLoaded({
     required this.documents,
     required this.totalCount,
     required this.currentPage,
@@ -27,28 +29,28 @@ class DocumentLoaded extends DocumentState {
   List<Object?> get props => [documents, totalCount, currentPage, totalPages];
 }
 
-class DocumentAdded extends DocumentState {
-  final Document document;
+class DocumentsAdded extends DocumentState {
+  final List<Document> documents; // Handling multiple documents
 
-  DocumentAdded({required this.document});
+  const DocumentsAdded({required this.documents});
 
   @override
-  List<Object?> get props => [document];
+  List<Object?> get props => [documents];
 }
 
-class DocumentUpdated extends DocumentState {
-  final Document document;
+class DocumentsUpdated extends DocumentState {
+  final List<Document> documents; // Handling multiple documents
 
-  DocumentUpdated({required this.document});
+  const DocumentsUpdated({required this.documents});
 
   @override
-  List<Object?> get props => [document];
+  List<Object?> get props => [documents];
 }
 
 class DocumentDeleted extends DocumentState {
   final int documentID;
 
-  DocumentDeleted({required this.documentID});
+  const DocumentDeleted({required this.documentID});
 
   @override
   List<Object?> get props => [documentID];
@@ -57,7 +59,7 @@ class DocumentDeleted extends DocumentState {
 class DocumentError extends DocumentState {
   final String message;
 
-  DocumentError({required this.message});
+  const DocumentError({required this.message});
 
   @override
   List<Object?> get props => [message];

@@ -36,4 +36,12 @@ class Document {
       'uploadDate': uploadDate.toIso8601String(),
     };
   }
+
+  static List<Document> fromJsonList(List<dynamic> jsonList) {
+    return jsonList.map((json) => Document.fromJson(json)).toList();
+  }
+
+  static List<Map<String, dynamic>> toJsonList(List<Document> documents) {
+    return documents.map((document) => document.toJson()).toList();
+  }
 }
