@@ -6,6 +6,7 @@ import 'package:client_management_app/blocs/document/document_state.dart';
 import 'package:client_management_app/models/project/project.dart';
 import 'package:client_management_app/models/document/document.dart';
 import 'package:client_management_app/widgets/pagination_controls.dart';
+import 'package:file_picker/file_picker.dart';
 
 class DocumentsTab extends StatelessWidget {
   final Project project;
@@ -120,6 +121,17 @@ class DocumentsTab extends StatelessWidget {
         return Icons.description;
       case 'xlsx':
         return Icons.grid_on;
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+        return Icons.image;
+      case 'mp4':
+      case 'avi':
+      case 'mov':
+        return Icons.movie;
+      case 'mp3':
+      case 'wav':
+        return Icons.audiotrack;
       default:
         return Icons.insert_drive_file;
     }
@@ -131,8 +143,10 @@ class DocumentsTab extends StatelessWidget {
       builder: (context) {
         return DocumentDialog(
           project: project,
-          onSave: (document) {
-            context.read<DocumentBloc>().add(AddDocument(document: document));
+          onSave: (documents) {
+            for (var document in documents) {
+              context.read<DocumentBloc>().add(AddDocument(document: document));
+            }
           },
         );
       },
@@ -146,10 +160,12 @@ class DocumentsTab extends StatelessWidget {
         return DocumentDialog(
           project: project,
           document: document,
-          onSave: (updatedDocument) {
-            context
-                .read<DocumentBloc>()
-                .add(UpdateDocument(document: updatedDocument));
+          onSave: (updatedDocuments) {
+            for (var document in updatedDocuments) {
+              context
+                  .read<DocumentBloc>()
+                  .add(UpdateDocument(document: document));
+            }
           },
         );
       },
@@ -190,7 +206,7 @@ class DocumentsTab extends StatelessWidget {
 class DocumentDialog extends StatefulWidget {
   final Project project;
   final Document? document;
-  final Function(Document) onSave;
+  final Function(List<Document>) onSave;
 
   const DocumentDialog({
     super.key,
@@ -205,48 +221,55 @@ class DocumentDialog extends StatefulWidget {
 }
 
 class _DocumentDialogState extends State<DocumentDialog> {
-  late TextEditingController _documentNameController;
-  late TextEditingController _documentTypeController;
-  late TextEditingController _documentPathController;
+  final List<PlatformFile> _selectedFiles = [];
 
-  @override
-  void initState() {
-    super.initState();
-    _documentNameController =
-        TextEditingController(text: widget.document?.documentName ?? '');
-    _documentTypeController =
-        TextEditingController(text: widget.document?.documentType ?? '');
-    _documentPathController =
-        TextEditingController(text: widget.document?.documentPath ?? '');
+  Future<void> _pickFiles() async {
+    FilePickerResult? result =
+        await FilePicker.platform.pickFiles(allowMultiple: true);
+
+    if (result != null) {
+      setState(() {
+        _selectedFiles.addAll(result.files);
+      });
+    }
   }
 
-  @override
-  void dispose() {
-    _documentNameController.dispose();
-    _documentTypeController.dispose();
-    _documentPathController.dispose();
-    super.dispose();
+  void _removeFile(int index) {
+    setState(() {
+      _selectedFiles.removeAt(index);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.document == null ? 'Add Document' : 'Edit Document'),
+      title: Text(widget.document == null ? 'Add Documents' : 'Edit Documents'),
       content: SingleChildScrollView(
-        child: ListBody(
+        child: Column(
           children: [
-            TextFormField(
-              controller: _documentNameController,
-              decoration: const InputDecoration(labelText: 'Document Name'),
+            ElevatedButton.icon(
+              onPressed: _pickFiles,
+              icon: const Icon(Icons.attach_file),
+              label: const Text('Select Documents'),
             ),
-            TextFormField(
-              controller: _documentTypeController,
-              decoration: const InputDecoration(labelText: 'Document Type'),
-            ),
-            TextFormField(
-              controller: _documentPathController,
-              decoration: const InputDecoration(labelText: 'Document Path'),
-            ),
+            const SizedBox(height: 16.0),
+            if (_selectedFiles.isNotEmpty)
+              Column(
+                children: _selectedFiles.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  PlatformFile file = entry.value;
+
+                  return ListTile(
+                    leading: Icon(_getDocumentIcon(file.extension ?? '')),
+                    title: Text(file.name),
+                    subtitle: Text(file.extension ?? ''),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () => _removeFile(index),
+                    ),
+                  );
+                }).toList(),
+              ),
           ],
         ),
       ),
@@ -260,19 +283,53 @@ class _DocumentDialogState extends State<DocumentDialog> {
         TextButton(
           child: const Text('Save'),
           onPressed: () {
-            final newDocument = Document(
-              projectID: widget.project.projectID!,
-              documentName: _documentNameController.text,
-              documentType: _documentTypeController.text,
-              documentPath: _documentPathController.text,
-              uploadDate: DateTime.now(),
-              documentID: widget.document?.documentID,
-            );
-            widget.onSave(newDocument);
-            Navigator.of(context).pop();
+            if (_selectedFiles.isNotEmpty) {
+              List<Document> documents = _selectedFiles.map((file) {
+                return Document(
+                  projectID: widget.project.projectID!,
+                  documentName: file.name,
+                  documentType: file.extension ?? '',
+                  documentPath: file.path ?? '',
+                  uploadDate: DateTime.now(),
+                  documentID: widget.document?.documentID,
+                );
+              }).toList();
+
+              widget.onSave(documents);
+              Navigator.of(context).pop();
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text('Please select at least one document.')),
+              );
+            }
           },
         ),
       ],
     );
+  }
+
+  IconData _getDocumentIcon(String documentType) {
+    switch (documentType.toLowerCase()) {
+      case 'pdf':
+        return Icons.picture_as_pdf;
+      case 'docx':
+        return Icons.description;
+      case 'xlsx':
+        return Icons.grid_on;
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+        return Icons.image;
+      case 'mp4':
+      case 'avi':
+      case 'mov':
+        return Icons.movie;
+      case 'mp3':
+      case 'wav':
+        return Icons.audiotrack;
+      default:
+        return Icons.insert_drive_file;
+    }
   }
 }
