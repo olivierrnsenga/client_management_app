@@ -1,10 +1,19 @@
 import 'package:client_management_app/blocs/project/project_bloc.dart';
 import 'package:client_management_app/blocs/project/project_event.dart';
+import 'package:client_management_app/models/client/client.dart';
+import 'package:client_management_app/models/lawyer/lawyer.dart';
 import 'package:client_management_app/models/project/project.dart';
 import 'package:client_management_app/models/project/project_client.dart';
 import 'package:client_management_app/models/project/project_lawyer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:client_management_app/blocs/client/client_bloc.dart';
+import 'package:client_management_app/blocs/client/client_event.dart';
+import 'package:client_management_app/blocs/client/client_state.dart';
+import 'package:client_management_app/blocs/lawyer/lawyer_bloc.dart';
+import 'package:client_management_app/blocs/lawyer/lawyer_event.dart';
+import 'package:client_management_app/blocs/lawyer/lawyer_state.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class EditProjectPage extends StatefulWidget {
   final Project project;
@@ -23,6 +32,8 @@ class _EditProjectPageState extends State<EditProjectPage> {
   late TextEditingController _startDateController;
   late TextEditingController _endDateController;
   late TextEditingController _statusIDController;
+  late TextEditingController _clientSearchController;
+  late TextEditingController _lawyerSearchController;
 
   final List<ProjectClient> _selectedProjectClients = [];
   final List<ProjectLawyer> _selectedProjectLawyers = [];
@@ -40,6 +51,8 @@ class _EditProjectPageState extends State<EditProjectPage> {
         TextEditingController(text: widget.project.endDate.toIso8601String());
     _statusIDController =
         TextEditingController(text: widget.project.statusID.toString());
+    _clientSearchController = TextEditingController();
+    _lawyerSearchController = TextEditingController();
 
     // Initialize with existing projectClients and projectLawyers
     _selectedProjectClients.addAll(widget.project.projectClients);
@@ -53,6 +66,8 @@ class _EditProjectPageState extends State<EditProjectPage> {
     _startDateController.dispose();
     _endDateController.dispose();
     _statusIDController.dispose();
+    _clientSearchController.dispose();
+    _lawyerSearchController.dispose();
     super.dispose();
   }
 
@@ -146,8 +161,11 @@ class _EditProjectPageState extends State<EditProjectPage> {
                 spacing: 8.0,
                 children: _selectedProjectClients.map((projectClient) {
                   return Chip(
+                    avatar: const CircleAvatar(
+                      child: Icon(Icons.person),
+                    ),
                     label: Text(
-                        'Client ${projectClient.client.firstName} ${projectClient.client.lastName}'),
+                        ' ${projectClient.client.firstName} ${projectClient.client.lastName}'),
                     onDeleted: () {
                       setState(() {
                         _selectedProjectClients.remove(projectClient);
@@ -156,15 +174,57 @@ class _EditProjectPageState extends State<EditProjectPage> {
                   );
                 }).toList(),
               ),
-              // Similarly add Autocomplete for selecting and adding clients
-
+              TypeAheadFormField<Client>(
+                textFieldConfiguration: TextFieldConfiguration(
+                  controller: _clientSearchController,
+                  decoration: const InputDecoration(
+                    labelText: 'Search Client',
+                    suffixIcon: Icon(Icons.search),
+                  ),
+                ),
+                suggestionsCallback: (pattern) async {
+                  context.read<ClientBloc>().add(SearchClients(
+                        searchTerm: pattern,
+                        pageNumber: 1,
+                        pageSize: 10,
+                      ));
+                  if (context.read<ClientBloc>().state is ClientLoaded) {
+                    return (context.read<ClientBloc>().state as ClientLoaded)
+                        .clients;
+                  }
+                  return [];
+                },
+                itemBuilder: (context, Client suggestion) {
+                  return ListTile(
+                    title:
+                        Text('${suggestion.firstName} ${suggestion.lastName}'),
+                  );
+                },
+                onSuggestionSelected: (Client selectedClient) {
+                  setState(() {
+                    _selectedProjectClients.add(
+                      ProjectClient(
+                        projectID: widget.project.projectID!,
+                        clientID: selectedClient.clientID,
+                        client: selectedClient,
+                      ),
+                    );
+                    _clientSearchController.clear();
+                  });
+                },
+                noItemsFoundBuilder: (context) =>
+                    const Text('No clients found'),
+              ),
               const SizedBox(height: 16.0),
               Wrap(
                 spacing: 8.0,
                 children: _selectedProjectLawyers.map((projectLawyer) {
                   return Chip(
+                    avatar: const CircleAvatar(
+                      child: Icon(Icons.person_outline),
+                    ),
                     label: Text(
-                        'Lawyer ${projectLawyer.lawyer.firstName} ${projectLawyer.lawyer.lastName}'),
+                        '${projectLawyer.lawyer.firstName} ${projectLawyer.lawyer.lastName}'),
                     onDeleted: () {
                       setState(() {
                         _selectedProjectLawyers.remove(projectLawyer);
@@ -173,8 +233,47 @@ class _EditProjectPageState extends State<EditProjectPage> {
                   );
                 }).toList(),
               ),
-              // Similarly add Autocomplete for selecting and adding lawyers
-
+              TypeAheadFormField<Lawyer>(
+                textFieldConfiguration: TextFieldConfiguration(
+                  controller: _lawyerSearchController,
+                  decoration: const InputDecoration(
+                    labelText: 'Search Lawyer',
+                    suffixIcon: Icon(Icons.search),
+                  ),
+                ),
+                suggestionsCallback: (pattern) async {
+                  context.read<LawyerBloc>().add(SearchLawyers(
+                        searchTerm: pattern,
+                        pageNumber: 1,
+                        pageSize: 10,
+                      ));
+                  if (context.read<LawyerBloc>().state is LawyerLoaded) {
+                    return (context.read<LawyerBloc>().state as LawyerLoaded)
+                        .lawyers;
+                  }
+                  return [];
+                },
+                itemBuilder: (context, Lawyer suggestion) {
+                  return ListTile(
+                    title:
+                        Text('${suggestion.firstName} ${suggestion.lastName}'),
+                  );
+                },
+                onSuggestionSelected: (Lawyer selectedLawyer) {
+                  setState(() {
+                    _selectedProjectLawyers.add(
+                      ProjectLawyer(
+                        projectID: widget.project.projectID!,
+                        lawyerID: selectedLawyer.lawyerID,
+                        lawyer: selectedLawyer,
+                      ),
+                    );
+                    _lawyerSearchController.clear();
+                  });
+                },
+                noItemsFoundBuilder: (context) =>
+                    const Text('No lawyers found'),
+              ),
               const SizedBox(height: 16.0),
               TextFormField(
                 controller: _statusIDController,

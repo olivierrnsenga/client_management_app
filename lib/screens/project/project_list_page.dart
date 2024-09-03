@@ -119,22 +119,24 @@ class _ProjectListPageState extends State<ProjectListPage> {
                             DataCell(
                               GestureDetector(
                                 onTap: () => _showProjectDetails(project),
-                                child: Text(
-                                  project.projectClients
-                                      .map((pc) =>
-                                          '${pc.client.firstName} ${pc.client.lastName}')
-                                      .join(', '),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: project.projectClients.map((pc) {
+                                    return Text(
+                                        '${pc.client.firstName} ${pc.client.lastName}');
+                                  }).toList(),
                                 ),
                               ),
                             ),
                             DataCell(
                               GestureDetector(
                                 onTap: () => _showProjectDetails(project),
-                                child: Text(
-                                  project.projectLawyers
-                                      .map((pl) =>
-                                          '${pl.lawyer.firstName} ${pl.lawyer.lastName}')
-                                      .join(', '),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: project.projectLawyers.map((pl) {
+                                    return Text(
+                                        '${pl.lawyer.firstName} ${pl.lawyer.lastName}');
+                                  }).toList(),
                                 ),
                               ),
                             ),
