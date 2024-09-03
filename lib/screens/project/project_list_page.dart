@@ -119,24 +119,44 @@ class _ProjectListPageState extends State<ProjectListPage> {
                             DataCell(
                               GestureDetector(
                                 onTap: () => _showProjectDetails(project),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: project.projectClients.map((pc) {
-                                    return Text(
-                                        '${pc.client.firstName} ${pc.client.lastName}');
-                                  }).toList(),
+                                child: ConstrainedBox(
+                                  constraints: const BoxConstraints(
+                                    maxHeight:
+                                        50.0, // Adjust this value based on your layout needs
+                                  ),
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children:
+                                          project.projectClients.map((pc) {
+                                        return Text(
+                                            '${pc.client.firstName} ${pc.client.lastName}');
+                                      }).toList(),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
                             DataCell(
                               GestureDetector(
                                 onTap: () => _showProjectDetails(project),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: project.projectLawyers.map((pl) {
-                                    return Text(
-                                        '${pl.lawyer.firstName} ${pl.lawyer.lastName}');
-                                  }).toList(),
+                                child: ConstrainedBox(
+                                  constraints: const BoxConstraints(
+                                    maxHeight:
+                                        50.0, // Adjust this value based on your layout needs
+                                  ),
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children:
+                                          project.projectLawyers.map((pl) {
+                                        return Text(
+                                            '${pl.lawyer.firstName} ${pl.lawyer.lastName}');
+                                      }).toList(),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
