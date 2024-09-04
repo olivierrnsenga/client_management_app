@@ -10,6 +10,8 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
     on<FetchDocumentsByProjectId>(_onFetchDocumentsByProjectId);
     on<AddDocuments>(_onAddDocuments);
     on<DeleteDocument>(_onDeleteDocument);
+    on<FetchAllDocuments>(_onFetchAllDocuments);
+    on<SearchDocuments>(_onSearchDocuments);
   }
 
   Future<void> _onFetchDocumentsByProjectId(
@@ -54,7 +56,6 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
             .where((doc) => doc.documentID != event.documentID)
             .toList();
 
-        // Emit new state with updated list
         emit(DocumentLoaded(
           documents: updatedDocuments,
           totalCount: updatedDocuments.length,
@@ -62,6 +63,43 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
           totalPages: (updatedDocuments.length / 10).ceil(),
         ));
       }
+    } catch (e) {
+      emit(DocumentError(message: e.toString()));
+    }
+  }
+
+  Future<void> _onFetchAllDocuments(
+      FetchAllDocuments event, Emitter<DocumentState> emit) async {
+    emit(DocumentLoading());
+    try {
+      final documents = await documentRepository.fetchDocuments(
+          event.pageNumber, event.pageSize);
+      emit(DocumentLoaded(
+        documents: documents,
+        totalCount: documents.length,
+        currentPage: event.pageNumber,
+        totalPages: (documents.length / event.pageSize).ceil(),
+      ));
+    } catch (e) {
+      emit(DocumentError(message: e.toString()));
+    }
+  }
+
+  Future<void> _onSearchDocuments(
+      SearchDocuments event, Emitter<DocumentState> emit) async {
+    emit(DocumentLoading());
+    try {
+      final documents = await documentRepository.searchDocuments(
+        event.searchTerm,
+        event.pageNumber,
+        event.pageSize,
+      );
+      emit(DocumentLoaded(
+        documents: documents,
+        totalCount: documents.length,
+        currentPage: event.pageNumber,
+        totalPages: (documents.length / event.pageSize).ceil(),
+      ));
     } catch (e) {
       emit(DocumentError(message: e.toString()));
     }

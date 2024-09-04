@@ -53,3 +53,31 @@ class DeleteDocument extends DocumentEvent {
   @override
   List<Object?> get props => [documentID, projectId];
 }
+
+class FetchAllDocuments extends DocumentEvent {
+  final int pageNumber;
+  final int pageSize;
+
+  const FetchAllDocuments({
+    required this.pageNumber,
+    required this.pageSize,
+  });
+
+  @override
+  List<Object?> get props => [pageNumber, pageSize];
+}
+
+class SearchDocuments extends DocumentEvent {
+  final String searchTerm;
+  final int pageNumber;
+  final int pageSize;
+
+  const SearchDocuments({
+    required this.searchTerm,
+    required this.pageNumber,
+    required this.pageSize,
+  });
+
+  @override
+  List<Object?> get props => [searchTerm, pageNumber, pageSize];
+}

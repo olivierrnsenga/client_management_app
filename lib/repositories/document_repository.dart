@@ -83,4 +83,20 @@ class DocumentRepository {
       throw Exception('Failed to delete document');
     }
   }
+
+  // Add the searchDocuments method
+  Future<List<Document>> searchDocuments(
+      String searchTerm, int pageNumber, int pageSize) async {
+    final response = await http.get(
+      Uri.parse(
+          '$baseUrl/Documents/Search?searchTerm=$searchTerm&pageNumber=$pageNumber&pageSize=$pageSize'),
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body)['documents'];
+      return data.map((json) => Document.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to search documents');
+    }
+  }
 }

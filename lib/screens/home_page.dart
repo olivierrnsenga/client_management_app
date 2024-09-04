@@ -1,4 +1,5 @@
 import 'package:client_management_app/screens/client/client_list_page.dart';
+import 'package:client_management_app/screens/document/document_list_page.dart';
 import 'package:client_management_app/screens/lawyer/lawyer_list_page.dart';
 import 'package:client_management_app/screens/project/project_list_page.dart';
 import 'package:client_management_app/screens/user/user_list_page.dart';
@@ -84,6 +85,14 @@ class HomePage extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => const UserListPage()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.folder),
+              title: const Text('Documents'),
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const DocumentListPage()));
               },
             ),
           ],
