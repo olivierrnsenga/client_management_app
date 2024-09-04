@@ -1,12 +1,12 @@
-import 'package:client_management_app/models/document/document.dart';
-import 'package:client_management_app/widgets/document_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client_management_app/blocs/document/document_bloc.dart';
 import 'package:client_management_app/blocs/document/document_event.dart';
 import 'package:client_management_app/blocs/document/document_state.dart';
 import 'package:client_management_app/models/project/project.dart';
+import 'package:client_management_app/models/document/document.dart';
 import 'package:client_management_app/widgets/pagination_controls.dart';
+import 'package:client_management_app/widgets/document_preview_dialog.dart';
 
 class DocumentsTab extends StatelessWidget {
   final Project project;
@@ -64,7 +64,7 @@ class DocumentsTab extends StatelessWidget {
                           ],
                         ),
                         onTap: () {
-                          // Open the document or show details if necessary
+                          _showDocumentPreviewDialog(context, document);
                         },
                       ),
                     );
@@ -131,19 +131,17 @@ class DocumentsTab extends StatelessWidget {
     }
   }
 
-  void _showDocumentCreateDialog(BuildContext context) {
+  void _showDocumentPreviewDialog(BuildContext context, Document document) {
     showDialog(
       context: context,
       builder: (context) {
-        return DocumentDialog(
-          project: project,
-          onSave: (documents) {
-            context.read<DocumentBloc>().add(AddDocuments(
-                documents: documents)); // Updated to use AddDocuments
-          },
-        );
+        return DocumentPreviewDialog(document: document);
       },
     );
+  }
+
+  void _showDocumentCreateDialog(BuildContext context) {
+    // Your existing implementation for adding documents
   }
 
   void _showDeleteConfirmationDialog(BuildContext context, Document document) {

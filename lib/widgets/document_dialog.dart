@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:client_management_app/models/project/project.dart';
-import 'package:client_management_app/models/document/document.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:client_management_app/models/document/document.dart';
+import 'package:client_management_app/models/project/project.dart';
 
 class DocumentDialog extends StatefulWidget {
   final Project project;
-  final Document? document;
   final Function(List<Document>) onSave;
 
   const DocumentDialog({
     super.key,
     required this.project,
-    this.document,
     required this.onSave,
   });
 
@@ -43,7 +41,7 @@ class _DocumentDialogState extends State<DocumentDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.document == null ? 'Add Documents' : 'Edit Documents'),
+      title: const Text('Add Documents'),
       content: SingleChildScrollView(
         child: Column(
           children: [
@@ -60,7 +58,7 @@ class _DocumentDialogState extends State<DocumentDialog> {
                   PlatformFile file = entry.value;
 
                   return ListTile(
-                    leading: Icon(_getDocumentIcon(file.extension ?? '')),
+                    leading: const Icon(Icons.insert_drive_file),
                     title: Text(file.name),
                     subtitle: Text(file.extension ?? ''),
                     trailing: IconButton(
@@ -86,7 +84,7 @@ class _DocumentDialogState extends State<DocumentDialog> {
             if (_selectedFiles.isNotEmpty) {
               List<Document> documents = _selectedFiles.map((file) {
                 return Document(
-                  documentID: 0,
+                  documentID: 0, // Default to 0 for new documents
                   projectID: widget.project.projectID!,
                   documentName: file.name,
                   documentType: file.extension ?? '',
@@ -107,29 +105,5 @@ class _DocumentDialogState extends State<DocumentDialog> {
         ),
       ],
     );
-  }
-
-  IconData _getDocumentIcon(String documentType) {
-    switch (documentType.toLowerCase()) {
-      case 'pdf':
-        return Icons.picture_as_pdf;
-      case 'docx':
-        return Icons.description;
-      case 'xlsx':
-        return Icons.grid_on;
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-        return Icons.image;
-      case 'mp4':
-      case 'avi':
-      case 'mov':
-        return Icons.movie;
-      case 'mp3':
-      case 'wav':
-        return Icons.audiotrack;
-      default:
-        return Icons.insert_drive_file;
-    }
   }
 }

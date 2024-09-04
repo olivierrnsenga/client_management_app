@@ -34,7 +34,6 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
     emit(DocumentLoading());
     try {
       await documentRepository.addDocuments(event.documents);
-      // Refetch documents after adding
       add(FetchDocumentsByProjectId(
         projectId: event.documents.first.projectID,
         pageNumber: 1,
@@ -55,6 +54,7 @@ class DocumentBloc extends Bloc<DocumentEvent, DocumentState> {
             .where((doc) => doc.documentID != event.documentID)
             .toList();
 
+        // Emit new state with updated list
         emit(DocumentLoaded(
           documents: updatedDocuments,
           totalCount: updatedDocuments.length,
